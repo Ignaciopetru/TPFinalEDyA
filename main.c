@@ -93,7 +93,7 @@ char entrada_validar(char *comando, Intervalo * intervalo) {
 }
 
 int main() {
-
+/*
   int salida = 1;
   AVLTree arbol = itree_crear();
 
@@ -139,7 +139,7 @@ int main() {
         break;
       }
     case 'd':
-      itree_recorrer_dfs(arbol, intervalo_imprimir);
+      itree_recorrer_dfs(arbol, intervalo_imprimir, NULL);
       break;
 
     case 'b':
@@ -178,6 +178,16 @@ int main() {
   }
   // Se destruye el arbol sobre el cual se realizan las opearaciones.
   itree_destruir(arbol);
+*/
 
+  AVLTree a = itree_crear();
+  AVLTree b = itree_crear();
+
+  a = itree_insertar(a, intervalo_crear(4, 6));
+  b = itree_insertar(b, intervalo_crear(5, 8));
+  itree_recorrer_bfs(a, intervalo_imprimir);
+  itree_recorrer_bfs(b, intervalo_imprimir);
+  AVLTree asdf = itree_interseccion(a, b);
+  itree_recorrer_bfs(asdf, intervalo_imprimir);
   return 0;
 }
