@@ -9,7 +9,7 @@ typedef struct _DNodo DNodo;
 typedef DNodo* DList;
 
 // Tipo de la funcion destruir, para cada tipo de dato sera distinta.
-typedef void (*Visitante) (void *, void*);
+typedef void (*VisitanteD) (void *, void*);
 
 // Prototipos de funciones de manejo de la lista.
 
@@ -23,7 +23,7 @@ DNodo* dnodo_crear(void* , DNodo*, DNodo*);
 DList dnodo_agregar_inicio(DList, void*);
 
 // dlist_destruir se encarga de liberar la memoria dedicada a la lista.
-void dlist_destruir (DList, Visitante);
+void dlist_destruir (DList, VisitanteD);
 
 // dlist_eliminar_primero eliminia el primer nodo de la lista.
 DList dlist_eliminar_primero(DList);

@@ -36,7 +36,7 @@ DList dnodo_agregar_inicio(DList lista, void *dato) {
   }
 }
 
-void dlist_destruir(DList lista, Visitante liberar) {
+void dlist_destruir(DList lista, VisitanteD liberar) {
   DList proximo = lista;
   DList actual;
   for (; proximo != NULL;) {

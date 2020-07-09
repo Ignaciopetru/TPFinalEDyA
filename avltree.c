@@ -189,7 +189,6 @@ AVLTree itree_colisionIzquierda(AVLTree arbol) {
 // Funciones comparacion. -----------------------------------------------------
 
 
-
 AVLTree itree_insertar(AVLTree arbol, Intervalo * dato) {
   // Si llegamos a nodo vacio insertamos nuestro nodo nuevo
   if (arbol == NULL) {

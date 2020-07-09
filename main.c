@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "avltree.h"
-
+#include "hash.h"
 #define CAPACIDAD 200
 
 int entrada_validar(char * comando) {
@@ -38,8 +38,9 @@ int entrada_validar(char * comando) {
   }
   // si luego del primer alias la linea coincide con la creacion de comando, continuamos leyendo.
   if (/*validar_alias_nuevo(primerPalabra) == 1 &&*/ comando[i+1] == '=' && comando[i+2] == ' ') {
-    if (comando[i + 3] == '∼'){
+    if (comando[i + 3] == '~'){
       printf("Calculo del complemento\n");
+      return 1;
     } else if (comando[i + 3] == '{'){
       if(comando[i + 4] == 'x') {
           // Compresion
@@ -100,6 +101,29 @@ int entrada_validar(char * comando) {
   return 1;
 }
 
+
+
+int main()
+{
+    HashTabla *hash_tabla;
+
+
+    hash_tabla = hash_crear(10);
+    char * dato = malloc(sizeof(char)*8);
+    dato = strcpy(dato, "Banana");
+    hash_insertar(hash_tabla, dato, NULL);
+
+    AVLTree hola;
+    hola = 12;
+    hola = hash_buscar(hash_tabla, dato);
+    hash_eliminar(hash_tabla, dato);
+    printf("%d", hola);
+    hash_destuir(hash_tabla);
+
+
+    return 0;
+}
+/*
 int main() {
   int salida = 1;
 
@@ -124,4 +148,4 @@ int main() {
 
   }
   return 0;
-}
+}*/
