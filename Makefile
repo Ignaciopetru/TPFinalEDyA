@@ -1,7 +1,10 @@
 all: main
 
-main: main.c stack.o queue.o dlist.o avltree.o
-	gcc -Wall -Wextra -Werror -std=c99 -o main main.c avltree.o stack.o queue.o dlist.o -lm
+main: main.c stack.o queue.o dlist.o avltree.o hash.o
+	gcc  -std=c99 -o main main.c hash.o avltree.o stack.o queue.o dlist.o -lm
+
+hash.o: hash.c hash.h
+	gcc -c -Wall -Wextra -Werror -std=c99 hash.c
 
 avltree.o: avltree.c avltree.h stack.o queue.o dlist.o
 	gcc -c -Wall -Wextra -Werror -std=c99 avltree.c

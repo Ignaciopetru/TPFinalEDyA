@@ -22,6 +22,17 @@ HashTabla *hash_crear(int initial_size) {
     return hash_tabla;
 }
 
+
+int hash_hasheo(char *alias) {
+    unsigned long hash = 5381;
+     int c;
+
+     while (c = *alias++)
+         hash = ((hash << 5) + hash) + c;
+
+     return hash;
+}
+
 HashTabla *hash_insertar(HashTabla *tabla, char *alias, AVLTree conjunto) {
     int key;
     HashNodo *node;
@@ -41,7 +52,7 @@ HashTabla *hash_insertar(HashTabla *tabla, char *alias, AVLTree conjunto) {
     if(tabla->max_colitions < tabla->tabla[key].cantidad)
         tabla->max_colitions = tabla->tabla[key].cantidad;
 
-    return node;
+    return tabla;
 }
 
 int comparar(char*a1, char*a2){
@@ -103,12 +114,3 @@ void hash_destuir(HashTabla *tabla) {
     free(tabla);
 }
 
-int hash_hasheo(char *alias) {
-    unsigned long hash = 5381;
-       int c;
-
-       while (c = *alias++)
-           hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-
-       return hash;
-}

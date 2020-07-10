@@ -5,7 +5,7 @@
 #include "hash.h"
 #define CAPACIDAD 200
 
-int entrada_validar(char * comando) {
+int entrada_validar(char * comando, HashTabla *tabla) {
 
   if (strcmp(comando, "salir\n") == 0){
     printf("Saliendo...\n");
@@ -16,6 +16,7 @@ int entrada_validar(char * comando) {
   for (i = 0; comando[i] != ' ' && comando[i] != '\n' && i < 8; i++) {
     primerPalabra[i] = comando[i];
   }
+  primerPalabra[i] = '\0';
   if (comando[i] == '\n') {
     printf("Comando invalido por falta de argumentos.\n");
     return 1;
@@ -33,9 +34,14 @@ int entrada_validar(char * comando) {
     }
     alias[c] = '\0';
     // llamar a funcion impimir en el alias propuesto.
-    printf("%s", alias);
+    AVLTree conjunto = hash_buscar(tabla, alias);
+    if (conjunto)
+      itree_recorrer_bfs(conjunto, intervalo_imprimir);
+    else
+      printf("No existe el alias");
     return 1;
   }
+
   // si luego del primer alias la linea coincide con la creacion de comando, continuamos leyendo.
   if (/*validar_alias_nuevo(primerPalabra) == 1 &&*/ comando[i+1] == '=' && comando[i+2] == ' ') {
     if (comando[i + 3] == '~'){
@@ -43,8 +49,43 @@ int entrada_validar(char * comando) {
       return 1;
     } else if (comando[i + 3] == '{'){
       if(comando[i + 4] == 'x') {
-          // Compresion
-          printf("Compresion\n");
+        char numeroInicio[8], numeroFinal[8];
+        int c = 0;
+        i = i + 7;
+        for(; comando[i] != '\n' && comando[i]!= ' '; i++, c++)
+          numeroInicio[c] = comando[i];
+        if (comando[i] == '\n') {
+          printf("Comando mal escrito\n");
+          return 1;
+        }
+        numeroInicio[c] = '\0';
+        i = i +9;
+        for(c = 0; comando[i] != '\n' && comando[i]!= '}'; i++, c++)
+          numeroFinal[c] = comando[i];
+        if (comando[i] != '}') {
+          printf("Comando mal escrito\n");
+          return 1;
+        }
+        numeroFinal[c] = '\0';
+        printf("%s\n", primerPalabra);
+        if(hash_buscar(tabla, &primerPalabra) != NULL) {
+          hash_eliminar(tabla, &primerPalabra);
+          char *aliasNuevo = malloc(sizeof(primerPalabra));
+          aliasNuevo = strcpy(aliasNuevo, primerPalabra);
+          AVLTree conjunto = itree_crear();
+          conjunto = itree_insertar(conjunto, intervalo_crear(atoi(numeroInicio), atoi(numeroFinal)));
+          hash_insertar(tabla, aliasNuevo, conjunto);
+        } else {
+          char *aliasNuevo = malloc(sizeof(primerPalabra));
+          aliasNuevo = strcpy(aliasNuevo, primerPalabra);
+          AVLTree conjunto = itree_crear();
+          conjunto = itree_insertar(conjunto, intervalo_crear(atoi(numeroInicio), atoi(numeroFinal)));
+          hash_insertar(tabla, aliasNuevo, conjunto);
+        }
+        printf("[%s, %s] insenrtado\n", numeroInicio, numeroFinal);
+        return 1;
+
+        printf("Compresion\n");
       } else {
           // Extencion
           printf("Extension\n");
@@ -102,7 +143,7 @@ int entrada_validar(char * comando) {
 }
 
 
-
+/*
 int main()
 {
     HashTabla *hash_tabla;
@@ -111,7 +152,7 @@ int main()
     hash_tabla = hash_crear(10);
     char * dato = malloc(sizeof(char)*8);
     dato = strcpy(dato, "Banana");
-    hash_insertar(hash_tabla, dato, NULL);
+    hash_tabla = hash_insertar(hash_tabla, dato, NULL);
 
     AVLTree hola;
     hola = 12;
@@ -123,12 +164,12 @@ int main()
 
     return 0;
 }
-/*
+*/
 int main() {
   int salida = 1;
 
   printf("Interfaz 2.0\n");
-
+  HashTabla *tabla = hash_crear(10);
   while (salida) {
     char *comando = malloc(sizeof(char) * CAPACIDAD);
     // leemos con \n incluido
@@ -143,9 +184,9 @@ int main() {
       printf("Se exedio el largo permitido para un comando\n");
     } else
       // a entrada_validar se le debe pasar ademas la tabla hash
-      salida = entrada_validar(comando);
+      salida = entrada_validar(comando, tabla);
     free(comando);
 
   }
   return 0;
-}*/
+}
