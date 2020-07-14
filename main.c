@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "avltree.h"
 #include "hash.h"
 #define CAPACIDAD 200
@@ -16,84 +17,97 @@ typedef struct _Tokens{
 }Tokens;
 
 int es_un_numero (char *palabra) {
-  int retorno = 1;
   for(int i = 0; palabra[i]!= '\0'; i++) {
     if(isdigit(palabra[i]) == 0)
-      retorno = 0;
+      return 0;
   }
-  return retorno;
+  return 1;
 }
 
-// Hacer token_eliminar
+int es_un_numero_con_caracter(char *palabra, char caracter) {
+  for (int i = 0; palabra[i]!= '\0'; i++) {
+    if (isdigit(palabra[i]) == 0) {
+      if (palabra[i] == caracter && palabra[i+1] == '\0')
+        return 1;
+      else
+        return 0;
+    }
+  }
+  return 1;
+}
 
+int alias_validar (char *alias) {
+  for(int i = 0; alias[i]!= '\0'; i++) {
+    if(isalpha(alias[i]) == 0)
+      return 0;
+  }
+  return 1;
+}
 
 Token *token_crear (char *palabra) {
   Token *token = malloc(sizeof(Token));
-  token->alias = malloc(sizeof(char)*200);
+  token->alias = calloc(200,sizeof(char));
   if (strcmp(palabra, "salir") == 0) {
     token->tipo = 1;
-    token->alias = NULL;
     return token;
   } else if (strcmp(palabra, "imprimir") == 0) {
     token->tipo = 2;
-    token->alias = NULL;
     return token;
   } else if (strcmp(palabra, "=") == 0) {
     token->tipo = 3;
-    token->alias = NULL;
     return token;
   } else if (strcmp(palabra, "|") == 0) {
-    token->tipo = 3;
-    token->alias = NULL;
+    token->tipo = 4;
     return token;
   } else if (strcmp(palabra, "&") == 0) {
     token->tipo = 5;
-    token->alias = NULL;
     return token;
   } else if (strcmp(palabra, "-") == 0) {
     token->tipo = 6;
-    token->alias = NULL;
     return token;
   } else if (palabra[0] == '~') {
     token->tipo = 7;
-    token->alias = strcpy(token->alias, palabra);
+    token->alias = strcpy(token->alias, palabra + 1);
     return token;
   } else if (strcmp(palabra, "{x:") == 0) {
     token->tipo = 8;
-    token->alias = NULL;
     return token;
   } else if (strcmp(palabra, "<=") == 0) {
     token->tipo = 9;
-    token->alias = NULL;
     return token;
   } else if (strcmp(palabra, "x") == 0) {
     token->tipo = 10;
-    token->alias = NULL;
     return token;
-  } else if (palabra[strlen(palabra)] == '}') {
+  } else if (palabra[strlen(palabra)-1] == '}'&& es_un_numero_con_caracter(palabra, '}')) {
     token->tipo = 11;
     token->alias = strcpy(token->alias, palabra);
+    token->alias[strlen(palabra)-1] = '\0';
     return token;
-  } else if (palabra[0] == '{') {
-    // caso extension->
+  } else if (palabra[0] == '{' && es_un_numero_con_caracter(palabra + 1, ',')) {
     token->tipo = 12;
-    token->alias = palabra;
+    token->alias = strcpy(token->alias, palabra+1);
+    token->alias[strlen(palabra)-2] = '\0';
     return token;
   } else if (es_un_numero(palabra) == 1) {
     token->tipo = 13;
     token->alias = strcpy(token->alias, palabra);
     return token;
-  } else {
+  } else if (palabra[strlen(palabra)-1] == ',' && es_un_numero_con_caracter(palabra, ',')) {
     token->tipo = 14;
+    token->alias = strcpy(token->alias, palabra);
+    token->alias[strlen(palabra)-1] = '\0';
+    return token;
+  } else {
+    token->tipo = 15;
     token->alias = strcpy(token->alias, palabra);
     return token;
   }
 }
 
-Tokens token_lista_crear (const char *comando) {
+Tokens token_lista_crear (char *comando) {
   Tokens lista;
-  lista.palabras = malloc(sizeof(Token*)*50);
-  char * palabra = strtok(comando, " ");
+  lista.palabras = calloc(500, sizeof(Token*));
+  char *palabra = strtok(comando, " ");
   int i = 0;
    while( palabra != NULL ) {
       lista.palabras[i] = token_crear(palabra);
@@ -104,12 +118,28 @@ Tokens token_lista_crear (const char *comando) {
   return lista;
 }
 
+void tokens_destruir(Tokens lista) {
+  for(int i = 0; i < lista.largo; i++) {
+    free(lista.palabras[i]->alias);
+    free(lista.palabras[i]);
+  }
+  free(lista.palabras);
+}
+
+
+
+
+
 int main() {
-  char ff[20] = "798 = ~asd";
+  char ff[200] = "asd' = {123, 2, 3}";
+  //fgets (ff, 200, stdin);
+  //ff[strlen(ff)-1] = '\0';
   Tokens hola = token_lista_crear(ff);
   for(int i = 0; i<hola.largo; i++){
-    printf("%d, %s\n", hola.palabras[i]->tipo,hola.palabras[i]->alias);
+    printf("%d, %s, %d\n", hola.palabras[i]->tipo,hola.palabras[i]->alias, alias_validar(hola.palabras[i]->alias));
   }
+
+  tokens_destruir(hola);
   return 0;
 }
 
