@@ -18,7 +18,7 @@ typedef struct _Tokens{
 
 int es_un_numero (char *palabra) {
   for(int i = 0; palabra[i]!= '\0'; i++) {
-    if(isdigit(palabra[i]) == 0)
+    if(isdigit(palabra[i]) == 0 && palabra[i] != '-')
       return 0;
   }
   return 1;
@@ -26,7 +26,7 @@ int es_un_numero (char *palabra) {
 
 int es_un_numero_con_caracter(char *palabra, char caracter) {
   for (int i = 0; palabra[i]!= '\0'; i++) {
-    if (isdigit(palabra[i]) == 0) {
+    if (isdigit(palabra[i]) == 0 && palabra[i] != '-') {
       if (palabra[i] == caracter && palabra[i+1] == '\0')
         return 1;
       else
@@ -47,7 +47,7 @@ int alias_validar_sintaxis (char *alias) {
 // NULL si esta mal escrito o no existe, el arbol si existe
 AVLTree alias_validar (HashTabla *tabla, char *alias) {
   for(int i = 0; alias[i]!= '\0'; i++) {
-    if(isalpha(alias[i]) == 0 && alias[i] != 'ñ' & alias[i] !='Ñ')
+    if(isalpha(alias[i]) == 0 && alias[i] != 'ñ' && alias[i] !='Ñ')
       return NULL;
   }
   return hash_buscar(tabla, alias);
@@ -148,11 +148,11 @@ int parser(HashTabla *tabla, Tokens lista) {
     if (lista.largo == 1) {
       if (lista.palabras[0]->tipo == 1){
         printf("Saliendo\n");
-        return 1;
+        return 0;
       }
       else {
         printf("Comando invalido\n");
-        return 0;
+        return 1;
       }
     }
 
@@ -228,7 +228,7 @@ int parser(HashTabla *tabla, Tokens lista) {
             int inicio = atoi(lista.palabras[3]->alias);
             int final = atoi(lista.palabras[7]->alias);
             if (inicio <= final) {
-              printf("Crear conjunto: [%s, %s]", lista.palabras[3]->alias, lista.palabras[7]->alias);
+              printf("Crear conjunto: [%s, %s]\n", lista.palabras[3]->alias, lista.palabras[7]->alias);
               tabla = hash_insertar(tabla, lista.palabras[0]->alias, itree_insertar(NULL, intervalo_crear(inicio, final)));
               return 1;
             } else {
@@ -247,7 +247,7 @@ int parser(HashTabla *tabla, Tokens lista) {
         printf("Insertando conjunto: \n");
         AVLTree conjunto = itree_crear();
         for (int i = 2; i < lista.largo; i++) {
-          if (lista.palabras[i]->tipo == 11 ||lista.palabras[i]->tipo == 12 || lista.palabras[i]->tipo == 14) {
+          if (lista.palabras[i]->tipo == 11 ||lista.palabras[i]->tipo == 12 || lista.palabras[i]->tipo == 14 || lista.palabras[i]->tipo == 16) {
             conjunto = itree_insertar(conjunto, intervalo_crear(atoi(lista.palabras[i]->alias), atoi(lista.palabras[i]->alias)));
             printf("%s", lista.palabras[i]->alias);
           } else {
@@ -256,6 +256,7 @@ int parser(HashTabla *tabla, Tokens lista) {
             return 1;
           }
         }
+        tabla = hash_insertar(tabla, lista.palabras[0]->alias, conjunto);
         printf("Conjunto finalizado y almacenado\n");
         return 1;
       } else {
@@ -269,14 +270,23 @@ int parser(HashTabla *tabla, Tokens lista) {
 
 }
 
+void agregar(HashTabla *tabla) {
+  hash_insertar(tabla, "A", itree_insertar(NULL, intervalo_crear(2, 6)));
+}
+
 int main() {
-  char ff[CAPACIDAD] = "asd' = {123, 2, 3}";
-  fgets (ff, CAPACIDAD, stdin);
-  ff[strlen(ff)-1] = '\0';
-  Tokens hola = token_lista_crear(ff);
+  int salir = 1;
   HashTabla * tabla = hash_crear(10);
-  parser(tabla, hola);
-  tokens_destruir(hola);
+  printf("Interfaz 2.0\n");
+  while (salir) {
+    char buffer[CAPACIDAD];
+    fgets (buffer, CAPACIDAD, stdin);
+    buffer[strlen(buffer)-1] = '\0';
+    Tokens lista = token_lista_crear(buffer);
+    salir = parser(tabla, lista);
+    tokens_destruir(lista);
+  }
+  hash_destuir(tabla);
   return 0;
 }
 

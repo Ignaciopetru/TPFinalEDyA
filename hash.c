@@ -35,18 +35,27 @@ int hash_hasheo(char *alias) {
 
 HashTabla *hash_insertar(HashTabla *tabla, char *alias, AVLTree conjunto) {
     int key;
-    HashNodo *node;
+    HashNodo *nodoNuevo;
 
     key = hash_hasheo(alias) % tabla->size;
 
-    node = malloc(sizeof(HashNodo));
+
+    for (HashNodo *aux = tabla->tabla[key].lista; aux != NULL; aux = aux->sig) {
+      if (strcmp(alias, aux->alias) == 0) {
+        itree_destruir(aux->conjunto);
+        aux->conjunto = conjunto;
+        return tabla;
+      }
+    }
 
     // se setea el nuevo nodo
-    node->alias = alias;
-    node->sig = tabla->tabla[key].lista;
-    node->conjunto = conjunto;
+    nodoNuevo = malloc(sizeof(HashNodo));
+    nodoNuevo->alias = malloc(sizeof(char)*strlen(alias));
+    nodoNuevo->alias = strcpy(nodoNuevo->alias, alias);
+    nodoNuevo->sig = tabla->tabla[key].lista;
+    nodoNuevo->conjunto = conjunto;
 
-    tabla->tabla[key].lista = node;
+    tabla->tabla[key].lista = nodoNuevo;
     tabla->tabla[key].cantidad++;
 
     if(tabla->max_colitions < tabla->tabla[key].cantidad)

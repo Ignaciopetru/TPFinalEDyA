@@ -60,8 +60,7 @@ AVLTree rotar_derecha(AVLTree arbol) {
   copArbolIzq->altura =
       max(obtener_altura(copArbolIzq->izq),
           obtener_altura(copArbolIzq->der)) + 1;
-  // Se retorna el nuevo primer nodoz
-  printf("Roto derecha\n");
+  // Se retorna el nuevo primer nodo
   return copArbolIzq;
 }
 
@@ -79,7 +78,6 @@ AVLTree rotar_izquierda(AVLTree arbol) {
       max(obtener_altura(copArbolDer->izq),
           obtener_altura(copArbolDer->der)) + 1;
   // Se retorna el nuevo primer nodo
-  printf("Roto izquierda\n");
   return copArbolDer;
 }
 
