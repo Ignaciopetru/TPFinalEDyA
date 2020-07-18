@@ -229,7 +229,7 @@ int parser(HashTabla *tabla, Tokens lista) {
             int final = atoi(lista.palabras[7]->alias);
             if (inicio <= final) {
               printf("Crear conjunto: [%s, %s]\n", lista.palabras[3]->alias, lista.palabras[7]->alias);
-              tabla = hash_insertar(tabla, lista.palabras[0]->alias, itree_insertar(NULL, intervalo_crear(inicio, final)));
+              tabla = hash_insertar(tabla, lista.palabras[0]->alias, itree_insertar_disjutos(NULL, intervalo_crear(inicio, final)));
               return 1;
             } else {
               printf("Intervalo invalido\n");
@@ -248,7 +248,7 @@ int parser(HashTabla *tabla, Tokens lista) {
         AVLTree conjunto = itree_crear();
         for (int i = 2; i < lista.largo; i++) {
           if (lista.palabras[i]->tipo == 11 ||lista.palabras[i]->tipo == 12 || lista.palabras[i]->tipo == 14 || lista.palabras[i]->tipo == 16) {
-            conjunto = itree_insertar(conjunto, intervalo_crear(atoi(lista.palabras[i]->alias), atoi(lista.palabras[i]->alias)));
+            conjunto = itree_insertar_disjutos(conjunto, intervalo_crear(atoi(lista.palabras[i]->alias), atoi(lista.palabras[i]->alias)));
             printf("%s", lista.palabras[i]->alias);
           } else {
             printf("Sintaxis erronea\n");

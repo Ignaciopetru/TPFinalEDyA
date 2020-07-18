@@ -141,83 +141,24 @@ AVLTree inodo_crear(Intervalo dato) {
   return nodo;
 }
 
-AVLTree itree_colisionDerecha(AVLTree arbol) {
-  if(arbol->der == NULL)
-    return arbol;
-  Intervalo auxiliar;
-  auxiliar.inicio = arbol->der->intervalo.inicio - 1;
-  auxiliar.final = arbol->der->intervalo.final + 1;
-  if (inodo_interseccion(auxiliar, arbol->intervalo)) {
-    arbol->intervalo.final = auxiliar.final - 1;
-    arbol = itree_eliminar(arbol, arbol->der->intervalo);
+
+AVLTree itree_insertar_disjutos (AVLTree arbol, Intervalo intervalo) {
+
+  AVLTree interseccion = itree_intersecar(arbol, intervalo_crear(intervalo.inicio - 1, intervalo.final + 1));
+  while (interseccion != NULL) {
+    intervalo.inicio = min(intervalo.inicio, interseccion->intervalo.inicio);
+    intervalo.final = max(intervalo.final, interseccion->intervalo.final);
+    arbol = itree_eliminar(arbol, interseccion->intervalo);
+    interseccion = interseccion = itree_intersecar(arbol, intervalo_crear(intervalo.inicio - 1, intervalo.final + 1));
   }
-  AVLTree iterador = itree_crear();
-  for (; iterador != NULL; iterador = iterador->izq) {
-    auxiliar.inicio = iterador->intervalo.inicio - 1;
-    auxiliar.final = iterador->intervalo.final + 1;
-    if (inodo_interseccion(auxiliar, arbol->intervalo)) {
-      arbol->intervalo.final = iterador->intervalo.final;
-      arbol = itree_eliminar(arbol, iterador->intervalo);
-    }
-  }
-  return arbol;
+  return itree_insertar(arbol, intervalo);
 }
-
-AVLTree itree_colisionIzquierda(AVLTree arbol) {
-  if(arbol->izq == NULL)
-    return arbol;
-  Intervalo auxiliar;
-  auxiliar.inicio = arbol->izq->intervalo.inicio - 1;
-  auxiliar.final = arbol->izq->intervalo.final + 1;
-  if (inodo_interseccion(auxiliar, arbol->intervalo)) {
-    arbol->intervalo.inicio = auxiliar.inicio + 1;
-    arbol = itree_eliminar(arbol, arbol->izq->intervalo);
-  }
-  AVLTree iterador = itree_crear();
-  for (; iterador != NULL; iterador = iterador->der) {
-    auxiliar.inicio = iterador->intervalo.inicio - 1;
-    auxiliar.final = iterador->intervalo.final + 1;
-    if (inodo_interseccion(auxiliar, arbol->intervalo)) {
-      arbol->intervalo.inicio = iterador->intervalo.inicio;
-      arbol = itree_eliminar(arbol, iterador->intervalo);
-    }
-  }
-  return arbol;
-}
-
-
-// Funciones comparacion. -----------------------------------------------------
 
 
 AVLTree itree_insertar(AVLTree arbol, Intervalo dato) {
   // Si llegamos a nodo vacio insertamos nuestro nodo nuevo
   if (arbol == NULL) {
     return inodo_crear(dato);
-  }
-
-  Intervalo auxiliar;
-  auxiliar.inicio = arbol->intervalo.inicio - 1;
-  auxiliar.final = arbol->intervalo.final + 1;
-
-  if (inodo_interseccion(auxiliar, dato)) {
-    arbol->intervalo.inicio = min(arbol->intervalo.inicio, dato.inicio);
-    arbol->intervalo.final = max(arbol->intervalo.final, dato.final);
-
-    // Si el nuevo intervalo tiene inicio menor al del arbol hay dos opciones:
-    if (min(arbol->intervalo.inicio, dato.inicio) == dato.inicio) {
-      // si tambien sobresale por la derecha la colicion es doble
-      if(max(arbol->intervalo.final, dato.final) == dato.final) {
-        //colicion de ambos ladossss
-      } else {
-        // sino solo por la izquierda
-        arbol = itree_colisionIzquierda(arbol);
-      }
-    // sino puede que sobresalga por la derecha
-    } else if(max(arbol->intervalo.final, dato.final) == dato.final) {
-      arbol = itree_colisionDerecha(arbol);
-    }
-    // sino el nuevo nodo esta contenido en el viejo
-    return arbol;
   }
   // Buscamos la posicion que debe ocupar el nuevo nodo
   // segun BST, teniendo en cuenta ambos valores del intervalos.
@@ -295,7 +236,7 @@ AVLTree itree_intersecar(AVLTree arbol, Intervalo dato) {
 }
 
 AVLTree inodo_copiar(Intervalo origen, AVLTree destino) {
-  destino = itree_insertar(destino, intervalo_copiar(origen));
+  destino = itree_insertar_disjutos(destino, intervalo_copiar(origen));
   return destino;
 }
 
