@@ -8,20 +8,11 @@
 
 HashTabla *hash_crear(int initial_size) {
     HashTabla *hash_tabla = malloc(sizeof(HashTabla));
-
-    //memset(hash_tabla, 0, sizeof(hash_tabla));
-
-    hash_tabla->max_colitions = 0;
     hash_tabla->size = initial_size;
-    hash_tabla->used = 0;
-
     hash_tabla->tabla = malloc(sizeof(HashDato)*initial_size);
-
-    //memset(hash_tabla->tabla, 0, sizeof(HashDato)*initial_size);
 
     return hash_tabla;
 }
-
 
 int hash_hasheo(char *alias) {
     unsigned long hash = 5381;
@@ -57,9 +48,6 @@ HashTabla *hash_insertar(HashTabla *tabla, char *alias, AVLTree conjunto) {
 
     tabla->tabla[key].lista = nodoNuevo;
     tabla->tabla[key].cantidad++;
-
-    if(tabla->max_colitions < tabla->tabla[key].cantidad)
-        tabla->max_colitions = tabla->tabla[key].cantidad;
 
     return tabla;
 }

@@ -1,10 +1,6 @@
 #ifndef AVLTREE_H_INCLUDED
 #define AVLTREE_H_INCLUDED
-
-typedef struct _Intervalo {
-    int inicio;
-    int final;
-}Intervalo;
+#include "intervalo.h"
 
 typedef struct _AVLNodo {
     Intervalo intervalo;
@@ -47,11 +43,11 @@ AVLTree itree_duplicar(AVLTree);
 
 void inodo_imprimir(AVLTree);
 
-void intervalo_imprimir(Intervalo);
+
 
 AVLTree itree_insertar_disjutos (AVLTree, Intervalo);
 
-Intervalo intervalo_crear(int, int);
+
 AVLTree itree_union(AVLTree, AVLTree);
 AVLTree itree_interseccion(AVLTree, AVLTree);
 AVLTree itree_complemento(AVLTree);

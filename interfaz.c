@@ -5,6 +5,7 @@
 #include "interfaz.h"
 #include "avltree.h"
 #include "hash.h"
+#include "intervalo.h"
 
 
 int es_un_numero (char *palabra) {
@@ -29,7 +30,7 @@ int es_un_numero_con_caracter(char *palabra, char caracter) {
 
 int alias_validar_sintaxis (char *alias) {
   for(int i = 0; alias[i]!= '\0'; i++) {
-    if(isalpha(alias[i]) == 0)
+    if(isalpha(alias[i]) == 0 && isdigit(alias[i]) == 0)
       return 0;
   }
   return 1;
@@ -38,7 +39,7 @@ int alias_validar_sintaxis (char *alias) {
 // NULL si esta mal escrito o no existe, el arbol si existe
 AVLTree alias_validar (HashTabla *tabla, char *alias) {
   for(int i = 0; alias[i]!= '\0'; i++) {
-    if(isalpha(alias[i]) == 0)
+    if(isalpha(alias[i]) == 0 && isdigit(alias[i]) == 0)
       return NULL;
   }
   return hash_buscar(tabla, alias);
@@ -221,7 +222,7 @@ int parser(HashTabla *tabla, Tokens lista) {
         if (alias_validar_sintaxis(lista.palabras[0]->alias)) {
             int inicio = atoi(lista.palabras[3]->alias);
             int final = atoi(lista.palabras[7]->alias);
-            if (inicio <= final) {
+            if (intervalo_validar(intervalo_crear(inicio, final))) {
               tabla = hash_insertar(tabla, lista.palabras[0]->alias, itree_insertar_disjutos(NULL, intervalo_crear(inicio, final)));
               return 1;
             } else {
@@ -237,30 +238,71 @@ int parser(HashTabla *tabla, Tokens lista) {
 
     if (lista.palabras[0]->tipo == 15 && lista.largo > 2) {
       if (alias_validar_sintaxis(lista.palabras[0]->alias)) {
+
         AVLTree conjunto = itree_crear();
         if (lista.palabras[2]->tipo == 17 && lista.largo == 3) {
           conjunto = itree_insertar_disjutos(conjunto, intervalo_crear(1,-1));
         } else {
-          for (int i = 2; i < lista.largo; i++) {
-            if (lista.palabras[i]->tipo == 11 ||lista.palabras[i]->tipo == 12 || lista.palabras[i]->tipo == 14 || lista.palabras[i]->tipo == 16 || lista.palabras[i]->tipo == 17) {
-              conjunto = itree_insertar_disjutos(conjunto, intervalo_crear(atoi(lista.palabras[i]->alias), atoi(lista.palabras[i]->alias)));
+
+          if (lista.palabras[2]->tipo == 12) {
+            int inicio = atoi(lista.palabras[2]->alias);
+            // Primer elemento {num
+            if (intervalo_validar(intervalo_crear(inicio, inicio))) {
+              conjunto = itree_insertar_disjutos(conjunto, intervalo_crear(inicio, inicio));
             } else {
-              printf("Sintaxis erronea\n");
-            // Eliminar el conjunto creado hasta el momento.
+              printf("Numero fuera de rango\n");
               return 1;
             }
+            // Elementos intermedios num,
+            for (int i = 3; i < lista.largo - 1; i++) {
+              if (lista.palabras[i]->tipo == 14) {
+                inicio = atoi(lista.palabras[i]->alias);
+                if (intervalo_validar(intervalo_crear(inicio, inicio))) {
+                  conjunto = itree_insertar_disjutos(conjunto, intervalo_crear(inicio, inicio));
+                } else {
+                  printf("Numero fuera de rango\n");
+                  itree_destruir(conjunto);
+                  return 1;
+                }
+              } else {
+                  printf("Sintaxis erronea\n");
+                  itree_destruir(conjunto);
+                  return 1;
+              }
+            }
+            // Elemento final num}
+            if (lista.palabras[lista.largo - 1]->tipo == 11) {
+              inicio = atoi(lista.palabras[lista.largo - 1]->alias);
+              if (intervalo_validar(intervalo_crear(inicio, inicio))) {
+                conjunto = itree_insertar_disjutos(conjunto, intervalo_crear(inicio, inicio));
+              } else {
+                printf("Numero fuera de rango\n");
+                itree_destruir(conjunto);
+                return 1;
+              }
+            } else {
+                printf("Sintaxis erronea\n");
+                itree_destruir(conjunto);
+                return 1;
+              }
+        } else {
+            printf("Numero fuera de rango\n");
+            itree_destruir(conjunto);
+            return 1;
           }
-        }
 
         tabla = hash_insertar(tabla, lista.palabras[0]->alias, conjunto);
         return 1;
-      } else {
-        printf("Alias invalido\n");
-        return 1;
       }
 
+    } else {
+        printf("Alias invalido\n");
+        return 1;
     }
+
+
     printf("Comando invalido\n");
     return 1;
 
+  }
 }

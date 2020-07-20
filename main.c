@@ -4,7 +4,6 @@
 #include "interfaz.h"
 #include "hash.h"
 
-
 int main() {
   int salir = 1;
   HashTabla * tabla = hash_crear(10);

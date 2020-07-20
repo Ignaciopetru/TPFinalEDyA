@@ -3,9 +3,6 @@
 #include "avltree.h"
 #include "lists/queue.h"
 #include "lists/stack.h"
-#define INFINITO 32768
-#define VACIO ((Intervalo){.inicio = 1, .final = -1})
-
 
 // Funciones auxiliares -------------------------------------------------------
 
@@ -19,7 +16,6 @@ int min(int a, int b) {
     return a;
   return b;
 }
-
 
 int obtener_altura(AVLTree arbol) {
   if (arbol)
@@ -109,28 +105,9 @@ AVLTree balancear(AVLTree arbol, int balance) {
 
 // Funciones creacion ---------------------------------------------------------
 
-Intervalo intervalo_copiar(Intervalo intervalo) {
-  Intervalo nuevo;
-  nuevo.inicio = intervalo.inicio;
-  nuevo.final = intervalo.final;
-  return nuevo;
-}
-
-Intervalo intervalo_crear(int inicio, int final) {
-  Intervalo nuevo;
-  nuevo.inicio = inicio;
-  nuevo.final = final;
-  return nuevo;
-}
 
 AVLTree itree_crear() {
   return NULL;
-}
-
-int intervalo_interseccion(Intervalo datoArbol, Intervalo dato) {
-  if (datoArbol.inicio <= dato.final && datoArbol.final >= dato.inicio)
-    return 1;
-  return 0;
 }
 
 AVLTree inodo_crear(Intervalo dato) {
@@ -262,8 +239,13 @@ AVLTree itree_union(AVLTree a, AVLTree b) {
   if (b->intervalo.inicio == VACIO.inicio && b->intervalo.final == VACIO.final)
     return itree_duplicar(a);
 
-  arbol = itree_duplicar(a);
-  arbol = itree_recorrer_dfs(b, itree_copiar_agregar, arbol);
+  if(a->altura > b->altura) {
+    arbol = itree_duplicar(a);
+    arbol = itree_recorrer_dfs(b, itree_copiar_agregar, arbol);
+    return arbol;
+  }
+  arbol = itree_duplicar(b);
+  arbol = itree_recorrer_dfs(a, itree_copiar_agregar, arbol);
   return arbol;
 }
 
@@ -332,14 +314,11 @@ AVLTree itree_complemento(AVLTree conjunto) {
 
 }
 
-
 AVLTree itree_resta(AVLTree a, AVLTree b) {
   return itree_interseccion(a, itree_complemento(b));
 }
 
-
 // Funciones destrucción. -----------------------------------------------------
-
 
 AVLTree itree_eliminar(AVLTree arbol, Intervalo dato) {
   if (arbol == NULL) {
@@ -371,7 +350,7 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo dato) {
         free(temp);
 
       }
-    } else {              // Caso dos hijos
+    } else {  // Caso dos hijos
       // Busco el nodo menor del hijo derecho
       AVLTree actual = arbol->der;
       while (actual->izq != NULL)
@@ -411,14 +390,7 @@ void inodo_imprimir(AVLTree nodo) {
   intervalo_imprimir(nodo->intervalo);
 }
 
-void intervalo_imprimir(Intervalo intervalo) {
-  if (intervalo.inicio == VACIO.inicio && intervalo.final == VACIO.final)
-    printf("Ø");
-  else if (intervalo.inicio == intervalo.final)
-    printf("%d ", intervalo.inicio);
-  else
-    printf("%d:%d ", intervalo.inicio, intervalo.final);
-}
+
 
 AVLTree itree_recorrer_dfs(AVLTree arbol, Visitante visitante, AVLTree puntero) {
   Stack stack = stack_new();
