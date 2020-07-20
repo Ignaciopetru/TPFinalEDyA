@@ -12,7 +12,9 @@ typedef struct _AVLNodo {
     int mayorFinal;
     struct _AVLNodo *der;
     struct _AVLNodo *izq;
-}*AVLTree;
+}AVLNodo;
+
+typedef struct _AVLNodo * AVLTree;
 
 typedef AVLTree (*Visitante) (AVLTree, AVLTree);
 
@@ -40,6 +42,9 @@ AVLTree itree_recorrer_dfs(AVLTree, Visitante, AVLTree);
 AVLTree itree_recorrer_bfs(AVLTree, Visitante, AVLTree);
 
 // intervalo_imprimir (visitante) imprime los valores de un intervalo dado.
+
+AVLTree itree_duplicar(AVLTree);
+
 void inodo_imprimir(AVLTree);
 
 void intervalo_imprimir(Intervalo);

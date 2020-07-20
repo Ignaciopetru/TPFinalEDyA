@@ -1,7 +1,7 @@
 #ifndef INTERFAZ_H_INCLUDED
 #define INTERFAZ_H_INCLUDED
 #include "hash.h"
-#define CAPACIDAD 200
+#define CAPACIDAD 1024
 
 typedef struct _Token {
   int tipo;

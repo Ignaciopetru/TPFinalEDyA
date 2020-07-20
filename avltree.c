@@ -143,19 +143,22 @@ AVLTree inodo_crear(Intervalo dato) {
   return nodo;
 }
 
+AVLTree itree_duplicar(AVLTree arbol) {
 
-AVLTree itree_insertar_disjutos (AVLTree arbol, Intervalo intervalo) {
+  AVLTree copia = malloc(sizeof(AVLNodo));
+  memcpy(copia, arbol, sizeof(AVLNodo));
 
-  AVLTree interseccion = itree_intersecar(arbol, intervalo_crear(intervalo.inicio - 1, intervalo.final + 1));
-  while (interseccion != NULL) {
-    intervalo.inicio = min(intervalo.inicio, interseccion->intervalo.inicio);
-    intervalo.final = max(intervalo.final, interseccion->intervalo.final);
-    arbol = itree_eliminar(arbol, interseccion->intervalo);
-    interseccion = itree_intersecar(arbol, intervalo_crear(intervalo.inicio - 1, intervalo.final + 1));
-  }
-  return itree_insertar(arbol, intervalo);
+  if(arbol->der != NULL)
+    copia->der = itree_duplicar(arbol->der);
+  else
+    copia->der = NULL;
+  if(arbol->izq != NULL)
+    copia->izq = itree_duplicar(arbol->izq);
+  else
+    copia->izq = NULL;
+
+  return copia;
 }
-
 
 AVLTree itree_insertar(AVLTree arbol, Intervalo dato) {
   // Si llegamos a nodo vacio insertamos nuestro nodo nuevo
@@ -184,7 +187,17 @@ AVLTree itree_insertar(AVLTree arbol, Intervalo dato) {
   return balancear(arbol, balance);
 }
 
+AVLTree itree_insertar_disjutos (AVLTree arbol, Intervalo intervalo) {
 
+  AVLTree interseccion = itree_intersecar(arbol, intervalo_crear(intervalo.inicio - 1, intervalo.final + 1));
+  while (interseccion != NULL) {
+    intervalo.inicio = min(intervalo.inicio, interseccion->intervalo.inicio);
+    intervalo.final = max(intervalo.final, interseccion->intervalo.final);
+    arbol = itree_eliminar(arbol, interseccion->intervalo);
+    interseccion = itree_intersecar(arbol, intervalo_crear(intervalo.inicio - 1, intervalo.final + 1));
+  }
+  return itree_insertar(arbol, intervalo);
+}
 
 AVLTree itree_intersecar(AVLTree arbol, Intervalo dato) {
   // Si llegue a NULL, retorno
@@ -237,7 +250,7 @@ AVLTree itree_intersecar(AVLTree arbol, Intervalo dato) {
     return itree_intersecar(arbol->der, dato);
 }
 
-AVLTree itree_copiar(AVLTree origen, AVLTree destino) {
+AVLTree itree_copiar_agregar(AVLTree origen, AVLTree destino) {
   destino = itree_insertar_disjutos(destino, intervalo_copiar(origen->intervalo));
   return destino;
 }
@@ -245,12 +258,12 @@ AVLTree itree_copiar(AVLTree origen, AVLTree destino) {
 AVLTree itree_union(AVLTree a, AVLTree b) {
   AVLTree arbol = itree_crear();
   if (a->intervalo.inicio == VACIO.inicio && a->intervalo.final == VACIO.final)
-    return itree_recorrer_dfs(b, itree_copiar, arbol);
+    return itree_duplicar(b);
   if (b->intervalo.inicio == VACIO.inicio && b->intervalo.final == VACIO.final)
-    return itree_recorrer_dfs(a, itree_copiar, arbol);
+    return itree_duplicar(a);
 
-  arbol = itree_recorrer_dfs(a, itree_copiar, arbol);
-  arbol = itree_recorrer_dfs(b, itree_copiar, arbol);
+  arbol = itree_duplicar(a);
+  arbol = itree_recorrer_dfs(b, itree_copiar_agregar, arbol);
   return arbol;
 }
 
@@ -271,14 +284,12 @@ AVLTree itree_interseccion(AVLTree a, AVLTree b) {
     if (nodoInterseccion) {
       Intervalo interseccion = nodoInterseccion->intervalo;
       resultado = itree_insertar_disjutos(resultado, intervalo_crear(max(interseccion.inicio, nodo->intervalo.inicio), min(interseccion.final, nodo->intervalo.final)));
-
     }
 
     if (nodo->izq != NULL)
       stack_push(stack, nodo->izq);
     if (nodo->der != NULL)
       stack_push(stack, nodo->der);
-
   }
   stack_destruir(stack);
   if (resultado == NULL)
@@ -294,7 +305,6 @@ AVLTree itree_complemento(AVLTree conjunto) {
   // Caso universo.
   if (conjunto->intervalo.inicio == -INFINITO && conjunto->intervalo.final == INFINITO)
     return itree_insertar(NULL, intervalo_crear(1, -1));
-
 
   AVLTree resultado = itree_crear();
   Intervalo anterior = intervalo_crear(0, -INFINITO - 1);
