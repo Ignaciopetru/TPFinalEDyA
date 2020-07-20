@@ -14,7 +14,7 @@ typedef struct _AVLNodo {
     struct _AVLNodo *izq;
 }*AVLTree;
 
-typedef AVLTree (*Visitante) (Intervalo , AVLTree);
+typedef AVLTree (*Visitante) (AVLTree, AVLTree);
 
 // itree_crear inicializa el nuevo arbol de intervalos.
 AVLTree itree_crear();
@@ -37,14 +37,16 @@ AVLTree itree_eliminar(AVLTree, Intervalo);
 AVLTree itree_recorrer_dfs(AVLTree, Visitante, AVLTree);
 
 // itree_recorrer_dfs recorre el arbol de la forma bfs.
-void itree_recorrer_bfs(AVLTree, Visitante);
+AVLTree itree_recorrer_bfs(AVLTree, Visitante, AVLTree);
 
 // intervalo_imprimir (visitante) imprime los valores de un intervalo dado.
-void intervalo_imprimir(Intervalo);
+void inodo_imprimir(AVLTree);
 
 AVLTree itree_insertar_disjutos (AVLTree, Intervalo);
 
 Intervalo intervalo_crear(int, int);
 AVLTree itree_union(AVLTree, AVLTree);
 AVLTree itree_interseccion(AVLTree, AVLTree);
+AVLTree itree_complemento(AVLTree);
+AVLTree itree_resta(AVLTree, AVLTree);
 #endif

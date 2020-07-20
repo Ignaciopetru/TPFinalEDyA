@@ -3,7 +3,7 @@
 #include "avltree.h"
 #include "lists/queue.h"
 #include "lists/stack.h"
-
+#define INFINITO 32768
 // Funciones auxiliares -------------------------------------------------------
 
 int max(int a, int b) {
@@ -124,7 +124,7 @@ AVLTree itree_crear() {
   return NULL;
 }
 
-int inodo_interseccion(Intervalo datoArbol, Intervalo dato) {
+int intervalo_interseccion(Intervalo datoArbol, Intervalo dato) {
   if (datoArbol.inicio <= dato.final && datoArbol.final >= dato.inicio)
     return 1;
   return 0;
@@ -188,7 +188,7 @@ AVLTree itree_intersecar(AVLTree arbol, Intervalo dato) {
   if (arbol == NULL)
     return arbol;
   // Si se encontro interseccion, devuelvo ese nodo
-  if (inodo_interseccion(arbol->intervalo, dato))
+  if (intervalo_interseccion(arbol->intervalo, dato))
     return arbol;
   // Si no se logro intersecar, el nodo a intersecar esta completamente
   // a la izquierda o completamente a la derecha.
@@ -234,38 +234,92 @@ AVLTree itree_intersecar(AVLTree arbol, Intervalo dato) {
     return itree_intersecar(arbol->der, dato);
 }
 
-AVLTree inodo_copiar(Intervalo origen, AVLTree destino) {
-  destino = itree_insertar_disjutos(destino, intervalo_copiar(origen));
+AVLTree itree_copiar(AVLTree origen, AVLTree destino) {
+  destino = itree_insertar_disjutos(destino, intervalo_copiar(origen->intervalo));
   return destino;
 }
 
 AVLTree itree_union(AVLTree a, AVLTree b) {
   AVLTree arbol = itree_crear();
-  arbol = itree_recorrer_dfs(a, inodo_copiar, arbol);
-  arbol = itree_recorrer_dfs(b, inodo_copiar, arbol);
+  arbol = itree_recorrer_dfs(a, itree_copiar, arbol);
+  arbol = itree_recorrer_dfs(b, itree_copiar, arbol);
   return arbol;
 }
 
 AVLTree itree_interseccion(AVLTree a, AVLTree b) {
+
   AVLTree resultado = itree_crear();
 
   Stack stack = stack_new();
-  stack_push(stack, a);
+  if (a != NULL)
+    stack_push(stack, a);
+
   while (!stack_isEmpty(stack)) {
     AVLTree nodo = stack_top(stack);
     stack_pop(stack);
-    if (nodo != NULL) {
-      Intervalo interseccion = itree_intersecar(b, nodo->intervalo)->intervalo;
-      intervalo_imprimir(interseccion);
-      resultado = itree_insertar(resultado, intervalo_crear(max(interseccion.inicio, nodo->intervalo.inicio), min(interseccion.final, nodo->intervalo.final)));
-      stack_push(stack, nodo->der);
-      stack_push(stack, nodo->izq);
+
+    AVLTree nodoInterseccion = itree_intersecar(b, nodo->intervalo);
+    if (nodoInterseccion) {
+      Intervalo interseccion = nodoInterseccion->intervalo;
+      resultado = itree_insertar_disjutos(resultado, intervalo_crear(max(interseccion.inicio, nodo->intervalo.inicio), min(interseccion.final, nodo->intervalo.final)));
+
     }
+
+    if (nodo->izq != NULL)
+      stack_push(stack, nodo->izq);
+    if (nodo->der != NULL)
+      stack_push(stack, nodo->der);
+
   }
   stack_destruir(stack);
+  if (resultado == NULL)
+    resultado = itree_insertar(resultado, intervalo_crear(1, -1));
 
   return resultado;
 }
+
+AVLTree itree_complemento(AVLTree conjunto) {
+  // Caso conjunto vacio.
+  if (conjunto->intervalo.inicio == 1 &&conjunto->intervalo.final == -1)
+    return itree_insertar(NULL, intervalo_crear(-INFINITO, INFINITO));
+
+  if (conjunto->intervalo.inicio == -INFINITO &&conjunto->intervalo.final == INFINITO)
+    return itree_insertar(NULL, intervalo_crear(1, -1));
+
+  AVLTree resultado = itree_crear();
+  Intervalo anterior = intervalo_crear(-INFINITO, -INFINITO);
+
+  Stack stack = stack_new();
+  AVLTree actual = conjunto;
+
+  while(actual != NULL || stack_isEmpty(stack) == 0) {
+    while (actual) {
+    stack_push(stack, actual);
+    actual = actual->izq;
+    }
+
+    AVLTree temp = stack_top(stack);
+    stack_pop(stack);
+    actual = temp->der;
+
+    resultado = itree_insertar_disjutos(resultado, intervalo_crear(anterior.final+1, temp->intervalo.inicio-1));
+    anterior = temp->intervalo;
+
+    //printf("[%d, %d]", temp->intervalo.inicio, temp->intervalo.final);
+  }
+
+  resultado = itree_insertar(resultado, intervalo_crear(anterior.final+1, INFINITO));
+
+
+  return resultado;
+
+}
+
+
+AVLTree itree_resta(AVLTree a, AVLTree b) {
+  return itree_interseccion(a, itree_complemento(b));
+}
+
 
 // Funciones destrucción. -----------------------------------------------------
 
@@ -325,55 +379,56 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo dato) {
   return balancear(arbol, balance);
 }
 
+void inodo_destruir(Intervalo intervalo, AVLTree nodo) {
+  free(nodo);
+}
+
 void itree_destruir(AVLTree arbol) {
-  if (arbol != NULL) {
-    itree_destruir(arbol->der);
-    itree_destruir(arbol->izq);
-    free(arbol);
-  }
+  if (arbol)
+    itree_recorrer_bfs(arbol, inodo_destruir, NULL);
 }
 
 // Funciones recorrer
 
-void intervalo_imprimir(Intervalo  intervalo) {
-  printf("[%d, %d]\n", intervalo.inicio, intervalo.final);
+void inodo_imprimir(AVLTree nodo) {
+  intervalo_imprimir(nodo->intervalo);
 }
 
-void inorder(AVLTree arbol) {
-  if (arbol == NULL)
-    return;
-  inorder(arbol->izq);
-  printf("[%d, %d] - maximo: %d altura:%d\n", arbol->intervalo.inicio,
-         arbol->intervalo.final, arbol->mayorFinal, arbol->altura);
-  inorder(arbol->der);
+void intervalo_imprimir(Intervalo  intervalo) {
+  if (intervalo.inicio == intervalo.final)
+    printf("%d,", intervalo.inicio);
+  else
+    printf("%d:%d,", intervalo.inicio, intervalo.final);
 }
 
 AVLTree itree_recorrer_dfs(AVLTree arbol, Visitante visitante, AVLTree puntero) {
   Stack stack = stack_new();
-  stack_push(stack, arbol);
+  if (arbol)
+    stack_push(stack, arbol);
   while (!stack_isEmpty(stack)) {
     AVLTree nodo = stack_top(stack);
     stack_pop(stack);
-    if (nodo != NULL) {
-      puntero = visitante(nodo->intervalo, puntero);
+    puntero = visitante(nodo, puntero);
+    if (nodo->der != NULL)
       stack_push(stack, nodo->der);
+    if (nodo->izq != NULL)
       stack_push(stack, nodo->izq);
-    }
   }
   stack_destruir(stack);
   return puntero;
 }
 
-void itree_recorrer_bfs(AVLTree arbol, Visitante visitante) {
+AVLTree itree_recorrer_bfs(AVLTree arbol, Visitante visitante, AVLTree puntero) {
   Queue queue = queue_new();
   queue_agregar(queue, arbol);
   while (!queue_isEmpty(queue)) {
     AVLTree nodo = queue_sacar(queue);
-    visitante(nodo->intervalo, NULL);
+    visitante(nodo, NULL);
     if (nodo->izq != NULL)
       queue_agregar(queue, nodo->izq);
     if (nodo->der != NULL)
       queue_agregar(queue, nodo->der);
   }
   queue_destruir(queue);
+  return puntero;
 }

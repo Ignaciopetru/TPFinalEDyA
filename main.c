@@ -160,7 +160,8 @@ int parser(HashTabla *tabla, Tokens lista) {
       if (lista.palabras[0]->tipo == 2 && lista.palabras[1]->tipo == 15){
         AVLTree conjunto = alias_validar(tabla, lista.palabras[1]->alias);
         if (conjunto) {
-          itree_recorrer_bfs(conjunto, intervalo_imprimir);
+          itree_recorrer_bfs(conjunto, (Visitante) inodo_imprimir, NULL);
+          puts("");
           return 1;
         } else {
           printf("Alias invalido\n");
@@ -180,8 +181,7 @@ int parser(HashTabla *tabla, Tokens lista) {
             AVLTree conjuntoComplemento = alias_validar(tabla, lista.palabras[2]->alias);
             if (conjuntoComplemento) {
               // insertar si encuentra el mismo elemento reemplaza.
-              //hash_insertar(tabla, lista.palabras[0]->alias, itree_complemento(conjuntoComplemento));
-              printf("Complemento: %s = ~%s\n", lista.palabras[0]->alias, lista.palabras[2]->alias);
+              hash_insertar(tabla, lista.palabras[0]->alias, itree_complemento(conjuntoComplemento));
               return 1;
             } else {
                printf("2do Alias invalido\n");
@@ -209,7 +209,7 @@ int parser(HashTabla *tabla, Tokens lista) {
             break;
           }
           case 6:{
-            printf("Hacer resta\n");
+            tabla = hash_insertar(tabla, lista.palabras[0]->alias, itree_resta(conjutoOperando1, conjutoOperando2));
             break;
           }
           default:
