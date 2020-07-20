@@ -30,4 +30,4 @@ void hash_eliminar(HashTabla *, char *);
 
 void hash_destuir(HashTabla *);
 
-#endif // HASH_H_INCLUDED
+#endif

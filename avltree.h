@@ -42,6 +42,8 @@ AVLTree itree_recorrer_bfs(AVLTree, Visitante, AVLTree);
 // intervalo_imprimir (visitante) imprime los valores de un intervalo dado.
 void inodo_imprimir(AVLTree);
 
+void intervalo_imprimir(Intervalo);
+
 AVLTree itree_insertar_disjutos (AVLTree, Intervalo);
 
 Intervalo intervalo_crear(int, int);
