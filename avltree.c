@@ -1,4 +1,3 @@
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "avltree.h"
@@ -149,7 +148,7 @@ AVLTree itree_insertar_disjutos (AVLTree arbol, Intervalo intervalo) {
     intervalo.inicio = min(intervalo.inicio, interseccion->intervalo.inicio);
     intervalo.final = max(intervalo.final, interseccion->intervalo.final);
     arbol = itree_eliminar(arbol, interseccion->intervalo);
-    interseccion = interseccion = itree_intersecar(arbol, intervalo_crear(intervalo.inicio - 1, intervalo.final + 1));
+    interseccion = itree_intersecar(arbol, intervalo_crear(intervalo.inicio - 1, intervalo.final + 1));
   }
   return itree_insertar(arbol, intervalo);
 }
