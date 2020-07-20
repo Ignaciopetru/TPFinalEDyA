@@ -306,4 +306,5 @@ int parser(HashTabla *tabla, Tokens lista) {
     break;
     }
   }
+  return 1;
 }

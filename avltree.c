@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "avltree.h"
 #include "lists/queue.h"
 #include "lists/stack.h"
@@ -375,8 +376,11 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo dato) {
   return balancear(arbol, balance);
 }
 
-void inodo_destruir(Intervalo intervalo, AVLTree nodo) {
-  free(nodo);
+// Segundo argumento debe ser NULL
+
+void inodo_destruir(AVLTree arbol, AVLTree nodo) {
+  if (nodo == NULL)
+    free(arbol);
 }
 
 void itree_destruir(AVLTree arbol) {

@@ -15,14 +15,16 @@ HashTabla *hash_crear(int initial_size) {
 }
 
 int hash_hasheo(char *alias) {
-    unsigned long hash = 5381;
-     int c;
+  unsigned long hash = 5381;
+  unsigned int c;
 
-     while (c = *alias++)
-         hash = ((hash << 5) + hash) + c;
+   while ((c = (*alias++)))
+       hash = ((hash << 5) + hash) + c;
 
-     return hash;
+   return hash;
 }
+
+
 
 HashTabla *hash_insertar(HashTabla *tabla, char *alias, AVLTree conjunto) {
     int key;
