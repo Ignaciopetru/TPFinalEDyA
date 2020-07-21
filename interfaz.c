@@ -109,6 +109,7 @@ Token *token_crear (char *palabra) {
   } else {
     token->tipo = 15;
     token->alias = strcpy(token->alias, palabra);
+    token->alias[strlen(token->alias)] = '\0';
     return token;
   }
 }
@@ -136,23 +137,20 @@ void tokens_destruir(Tokens lista) {
 }
 
 int parser(HashTabla *tabla, Tokens lista) {
-  switch (lista.largo) {
-    case 0:
-      return 1;
-      break;
-    case 1: {
-      if (lista.palabras[0]->tipo == 1){
-        printf("Saliendo\n");
-        return 0;
-      }
-      else {
-        printf("Comando invalido\n");
-        return 1;
-      }
-    break;
+  if (lista.largo == 0)
+    return 1;
+  if (lista.largo == 1) {
+    if (lista.palabras[0]->tipo == 1){
+      printf("Saliendo\n");
+      return 0;
     }
-    case 2: {
-      if (lista.palabras[0]->tipo == 2 && lista.palabras[1]->tipo == 15){
+    else {
+      printf("Comando invalido\n");
+      return 1;
+    }  }
+
+  if (lista.largo == 2) {
+    if (lista.palabras[0]->tipo == 2 && lista.palabras[1]->tipo == 15){
       AVLTree conjunto = alias_validar(tabla, lista.palabras[1]->alias);
       if (conjunto) {
           itree_recorrer_bfs(conjunto, (Visitante) inodo_imprimir, NULL);
@@ -162,35 +160,35 @@ int parser(HashTabla *tabla, Tokens lista) {
           printf("Alias invalido\n");
           return 1;
         }
-      } else {
-        printf("Comando invalido\n");
-        return 1;
-      }
-      break;
+    } else {
+      printf("Comando invalido\n");
+      return 1;
     }
-    case 3: {
-      if (lista.palabras[1]->tipo == 3 && lista.palabras[0]->tipo == 15 && lista.palabras[2]->tipo == 7) {
+  }
+
+  if (lista.largo == 3) {
+    if (lista.palabras[1]->tipo == 3 && lista.palabras[0]->tipo == 15 && lista.palabras[2]->tipo == 7) {
       // puede no existir el conjunto.
       if (alias_validar_sintaxis(lista.palabras[0]->alias)) {
-          // si el alias es correcto y existe
-          AVLTree conjuntoComplemento = alias_validar(tabla, lista.palabras[2]->alias);
-          if (conjuntoComplemento) {
-            // insertar si encuentra el mismo elemento reemplaza.
-            hash_insertar(tabla, lista.palabras[0]->alias, itree_complemento(conjuntoComplemento));
-            return 1;
-          } else {
-             printf("2do Alias invalido\n");
-             return 1;
-          }
+        // si el alias es correcto y existe
+        AVLTree conjuntoComplemento = alias_validar(tabla, lista.palabras[2]->alias);
+        if (conjuntoComplemento) {
+          // insertar si encuentra el mismo elemento reemplaza.
+          hash_insertar(tabla, lista.palabras[0]->alias, itree_complemento(conjuntoComplemento));
+          return 1;
+        } else {
+           printf("2do Alias invalido\n");
+           return 1;
+        }
       } else {
           printf("1er alias invalido\n");
           return 1;
-        }
       }
-    break;
     }
-    case 5: {
-          if (lista.palabras[0]->tipo == 15 && lista.palabras[1]->tipo == 3 && lista.palabras[2]->tipo == 15 && lista.palabras[3]->tipo > 3 && lista.palabras[3]->tipo < 7 && lista.palabras[4]->tipo == 15) {
+  }
+
+  if (lista.largo == 5) {
+    if (lista.palabras[0]->tipo == 15 && lista.palabras[1]->tipo == 3 && lista.palabras[2]->tipo == 15 && lista.palabras[3]->tipo > 3 && lista.palabras[3]->tipo < 7 && lista.palabras[4]->tipo == 15) {
       AVLTree conjutoOperando1 = alias_validar(tabla, lista.palabras[2]->alias);
       AVLTree conjutoOperando2 = alias_validar(tabla, lista.palabras[4]->alias);
       if (alias_validar_sintaxis(lista.palabras[0]->alias) && conjutoOperando1 && conjutoOperando2) {
@@ -215,10 +213,11 @@ int parser(HashTabla *tabla, Tokens lista) {
         printf("Alias invalidos\n");
       }
     }
-    break;
-    }
-    case 8: {
-      if (lista.palabras[0]->tipo == 15 && lista.palabras[1]->tipo == 3 && lista.palabras[2]->tipo == 8 && lista.palabras[3]->tipo == 13 && lista.palabras[4]->tipo == 9 && lista.palabras[5]->tipo == 10 && lista.palabras[6]->tipo == 9 && lista.palabras[7]->tipo == 11) {
+  }
+
+
+  if (lista.largo == 8) {
+    if (lista.palabras[0]->tipo == 15 && lista.palabras[1]->tipo == 3 && lista.palabras[2]->tipo == 8 && lista.palabras[3]->tipo == 13 && lista.palabras[4]->tipo == 9 && lista.palabras[5]->tipo == 10 && lista.palabras[6]->tipo == 9 && lista.palabras[7]->tipo == 11) {
       if (alias_validar_sintaxis(lista.palabras[0]->alias)) {
           int inicio = atoi(lista.palabras[3]->alias);
           int final = atoi(lista.palabras[7]->alias);
@@ -234,10 +233,9 @@ int parser(HashTabla *tabla, Tokens lista) {
         printf("Alias invalido\n");
         return 1;
       }
-    break;
-    }
-    default: {
-      if (lista.palabras[0]->tipo == 15 && lista.largo > 2) {
+  }
+
+  if (lista.palabras[0]->tipo == 15 && lista.largo > 2) {
         if (alias_validar_sintaxis(lista.palabras[0]->alias)) {
 
           AVLTree conjunto = itree_crear();
@@ -300,11 +298,7 @@ int parser(HashTabla *tabla, Tokens lista) {
           printf("Alias invalido\n");
           return 1;
         }
-      }
-      printf("Comando invalido\n");
-      return 1;
-    break;
     }
+    return 1;
   }
-  return 1;
-}
+

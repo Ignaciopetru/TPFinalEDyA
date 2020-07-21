@@ -9,7 +9,7 @@
 HashTabla *hash_crear(int initial_size) {
   HashTabla *hash_tabla = malloc(sizeof(HashTabla));
   hash_tabla->size = initial_size;
-  hash_tabla->tabla = malloc(sizeof(HashDato)*initial_size);
+  hash_tabla->tabla = calloc(initial_size, sizeof(HashDato));
 
   return hash_tabla;
 }
@@ -34,27 +34,23 @@ HashTabla *hash_insertar(HashTabla *tabla, char *alias, AVLTree conjunto) {
   // Se obtienen la key del alias.
   key = hash_hasheo(alias) % tabla->size;
 
-  HashNodo *aux = tabla->tabla[key].lista;
-  for (; aux != NULL; aux = aux->sig) {
-    if (comparar(alias, aux->alias))
-      nodoNuevo = aux;
+  for (HashNodo *aux = tabla->tabla[key].lista; aux != NULL; aux = aux->sig) {
+    if (comparar(alias, aux->alias)){
+      itree_destruir(aux->conjunto);
+      aux->conjunto = conjunto;
+      return tabla;
+    }
   }
+  // se setea el nuevo nodo
+  nodoNuevo = malloc(sizeof(HashNodo));
+  nodoNuevo->alias = malloc(sizeof(char)*(strlen(alias) + 1));
+  nodoNuevo->alias = strcpy(nodoNuevo->alias, alias);
+  nodoNuevo->conjunto = conjunto;
+  nodoNuevo->sig = tabla->tabla[key].lista;
 
-  if (nodoNuevo) {
-    itree_destruir(nodoNuevo->conjunto);
-    nodoNuevo->conjunto = conjunto;
-  } else {
+  tabla->tabla[key].lista = nodoNuevo;
+  tabla->tabla[key].cantidad++;
 
-    // se setea el nuevo nodo
-    nodoNuevo = malloc(sizeof(HashNodo));
-    nodoNuevo->alias = malloc(sizeof(char)*strlen(alias));
-    nodoNuevo->alias = strcpy(nodoNuevo->alias, alias);
-    nodoNuevo->conjunto = conjunto;
-    nodoNuevo->sig = tabla->tabla[key].lista;
-
-    tabla->tabla[key].lista = nodoNuevo;
-    tabla->tabla[key].cantidad++;
-  }
 
   return tabla;
 }

@@ -308,7 +308,7 @@ AVLTree itree_complemento(AVLTree conjunto) {
     resultado = itree_insertar_disjutos(resultado, intervalo_crear(anterior.final + 1, temp->intervalo.inicio - 1));
     anterior = temp->intervalo;
   }
-
+  stack_destruir(stack);
   resultado = itree_insertar(resultado, intervalo_crear(anterior.final + 1, INFINITO));
 
   return resultado;
@@ -316,7 +316,10 @@ AVLTree itree_complemento(AVLTree conjunto) {
 }
 
 AVLTree itree_resta(AVLTree a, AVLTree b) {
-  return itree_interseccion(a, itree_complemento(b));
+  AVLTree complemento2 = itree_complemento(b);
+  AVLTree resultado = itree_interseccion(a, complemento2);
+  itree_destruir(complemento2);
+  return resultado;
 }
 
 // Funciones destrucción. -----------------------------------------------------
@@ -378,14 +381,13 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo dato) {
 
 // Segundo argumento debe ser NULL
 
-void inodo_destruir(AVLTree arbol, AVLTree nodo) {
-  if (nodo == NULL)
-    free(arbol);
-}
-
 void itree_destruir(AVLTree arbol) {
-  if (arbol)
-    itree_recorrer_bfs(arbol, (Visitante)inodo_destruir, NULL);
+  if (arbol) {
+    itree_destruir(arbol->der);
+    itree_destruir(arbol->izq);
+  }
+  free(arbol);
+
 }
 
 // Funciones recorrer
