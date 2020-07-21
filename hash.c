@@ -7,109 +7,110 @@
 
 
 HashTabla *hash_crear(int initial_size) {
-    HashTabla *hash_tabla = malloc(sizeof(HashTabla));
-    hash_tabla->size = initial_size;
-    hash_tabla->tabla = malloc(sizeof(HashDato)*initial_size);
+  HashTabla *hash_tabla = malloc(sizeof(HashTabla));
+  hash_tabla->size = initial_size;
+  hash_tabla->tabla = malloc(sizeof(HashDato)*initial_size);
 
-    return hash_tabla;
+  return hash_tabla;
 }
 
 int hash_hasheo(char *alias) {
   unsigned long hash = 5381;
   unsigned int c;
 
-   while ((c = (*alias++)))
-       hash = ((hash << 5) + hash) + c;
+  while ((c = (*alias++)))
+    hash = ((hash << 5) + hash) + c;
 
-   return hash;
-}
-
-
-
-HashTabla *hash_insertar(HashTabla *tabla, char *alias, AVLTree conjunto) {
-    int key;
-    HashNodo *nodoNuevo;
-
-    key = hash_hasheo(alias) % tabla->size;
-
-
-    for (HashNodo *aux = tabla->tabla[key].lista; aux != NULL; aux = aux->sig) {
-      if (strcmp(alias, aux->alias) == 0) {
-        itree_destruir(aux->conjunto);
-        aux->conjunto = conjunto;
-        return tabla;
-      }
-    }
-
-    // se setea el nuevo nodo
-    nodoNuevo = malloc(sizeof(HashNodo));
-    nodoNuevo->alias = malloc(sizeof(char)*strlen(alias));
-    nodoNuevo->alias = strcpy(nodoNuevo->alias, alias);
-    nodoNuevo->sig = tabla->tabla[key].lista;
-    nodoNuevo->conjunto = conjunto;
-
-    tabla->tabla[key].lista = nodoNuevo;
-    tabla->tabla[key].cantidad++;
-
-    return tabla;
+  return hash;
 }
 
 int comparar(char*a1, char*a2){
   return strcmp(a1, a2) == 0;
 }
 
+HashTabla *hash_insertar(HashTabla *tabla, char *alias, AVLTree conjunto) {
+  int key;
+  HashNodo *nodoNuevo = NULL;
+  // Se obtienen la key del alias.
+  key = hash_hasheo(alias) % tabla->size;
+
+  HashNodo *aux = tabla->tabla[key].lista;
+  for (; aux != NULL; aux = aux->sig) {
+    if (comparar(alias, aux->alias))
+      nodoNuevo = aux;
+  }
+
+  if (nodoNuevo) {
+    itree_destruir(nodoNuevo->conjunto);
+    nodoNuevo->conjunto = conjunto;
+  } else {
+
+    // se setea el nuevo nodo
+    nodoNuevo = malloc(sizeof(HashNodo));
+    nodoNuevo->alias = malloc(sizeof(char)*strlen(alias));
+    nodoNuevo->alias = strcpy(nodoNuevo->alias, alias);
+    nodoNuevo->conjunto = conjunto;
+    nodoNuevo->sig = tabla->tabla[key].lista;
+
+    tabla->tabla[key].lista = nodoNuevo;
+    tabla->tabla[key].cantidad++;
+  }
+
+  return tabla;
+}
+
 AVLTree hash_buscar(HashTabla *tabla, char *alias) {
-    int key;
-    HashNodo *nodo;
+  int key;
+  HashNodo *nodo;
 
-    key = hash_hasheo(alias) % tabla->size;
+  key = hash_hasheo(alias) % tabla->size;
 
-    // Busca en la lista.
-    for(nodo = tabla->tabla[key].lista; nodo != NULL && comparar(alias, nodo->alias)!= 1; nodo = nodo->sig);
+  // Busca en la lista.
+  for(nodo = tabla->tabla[key].lista; nodo != NULL && comparar(alias, nodo->alias)!= 1; nodo = nodo->sig);
 
-    if(nodo == NULL)
-        return NULL;
-    return nodo->conjunto;
+  if(nodo == NULL)
+    return NULL;
+  return nodo->conjunto;
 }
 
 void hash_eliminar(HashTabla *tabla, char *alias) {
-    int key;
-    HashNodo *nodo;
+  int key;
+  HashNodo *nodo;
 
-    key = hash_hasheo(alias) % tabla->size;
-    nodo = tabla->tabla[key].lista;
+  key = hash_hasheo(alias) % tabla->size;
+  nodo = tabla->tabla[key].lista;
 
-    for(nodo = tabla->tabla[key].lista; nodo != NULL && comparar(alias, nodo->alias)!= 1; nodo = nodo->sig);
+  for(nodo = tabla->tabla[key].lista; nodo != NULL && comparar(alias, nodo->alias)!= 1; nodo = nodo->sig);
 
-    if(nodo == NULL) {
-        return;
-    }
-    if (nodo == tabla->tabla[key].lista) {
-      tabla->tabla[key].lista = nodo->sig;
-    }
+  if(nodo == NULL) {
+    return;
+  }
+  if (nodo == tabla->tabla[key].lista) {
+    tabla->tabla[key].lista = nodo->sig;
+  }
 
-    free(nodo->alias);
-    itree_destruir(nodo->conjunto);
-    free(nodo);
+  free(nodo->alias);
+  itree_destruir(nodo->conjunto);
+  free(nodo);
 }
 
 void hash_destuir(HashTabla *tabla) {
-    HashNodo *nodo;
-    HashNodo *nodoSig;
+  HashNodo *nodo;
+  HashNodo *nodoSig;
 
-    for(int i = 0; i<tabla->size; i++) {
-        nodo = tabla->tabla[i].lista;
+  for(int i = 0; i < tabla->size; i++) {
+    nodo = tabla->tabla[i].lista;
 
-        while(nodo != NULL) {
-            nodoSig = nodo->sig;
-            free(nodo->alias);
-            itree_destruir(nodo->conjunto);
-            free(nodo);
-            nodo = nodoSig;
-        }
+    while(nodo != NULL) {
+        nodoSig = nodo->sig;
+        free(nodo->alias);
+        itree_destruir(nodo->conjunto);
+        free(nodo);
+        nodo = nodoSig;
     }
+  }
 
-    free(tabla->tabla);
-    free(tabla);
+  free(tabla->tabla);
+  free(tabla);
 }
 
