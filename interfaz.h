@@ -1,6 +1,7 @@
 #ifndef INTERFAZ_H_INCLUDED
 #define INTERFAZ_H_INCLUDED
 #include "hash.h"
+// Tamanio de linea maximo
 #define CAPACIDAD 1024
 
 // 18 posibles tipos de token

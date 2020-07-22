@@ -1,6 +1,9 @@
 #ifndef INTERVALO_H_INCLUDED
 #define INTERVALO_H_INCLUDED
+
+// Menor mayor int aceptado en general.
 #define INFINITO 32768
+// Representacion del intervalo vacio.
 #define VACIO ((Intervalo){.inicio = 1, .final = -1})
 
 typedef struct _Intervalo {

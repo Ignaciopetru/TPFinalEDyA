@@ -42,7 +42,6 @@ AVLTree alias_validar (HashTabla *tabla, char *alias) {
 
 Token token_crear (char *palabra) {
   Token token;
-  token.alias = calloc(CAPACIDAD, sizeof(char));
 
   if (strcmp(palabra, "salir") == 0) {
     token.tipo = salir;
@@ -150,7 +149,7 @@ Token token_crear (char *palabra) {
     return token;
   } else if (alias_validar_sintaxis(palabra)) {
     token.tipo = alias;
-    token.alias = token.alias = malloc(sizeof(char) * strlen(palabra));
+    token.alias = malloc(sizeof(char) * strlen(palabra));
     token.alias = strcpy(token.alias, palabra);
 
     return token;
@@ -200,18 +199,51 @@ void insertar_conjunto_compresion (HashTabla *tabla, Tokens lista) {
     printf("Comando invalido \n");
     return;
   }
+
   if (lista.palabras[3].tipo == num && lista.palabras[4].tipo == menorIgual && lista.palabras[5].tipo == x && lista.palabras[6].tipo == menorIgual && lista.palabras[7].tipo == numCor) {
     Intervalo intervalo = intervalo_crear(lista.palabras[3].numero, lista.palabras[7].numero);
     if (intervalo_validar(intervalo)) {
       tabla = hash_insertar(tabla, lista.palabras[0].alias, itree_insertar(NULL, intervalo));
       return;
     }
+    tabla = hash_insertar(tabla, lista.palabras[0].alias, itree_insertar(NULL, VACIO));
+    return;
   }
   printf("Comando invalido \n");
 }
 
 void insertar_conjunto_extension (HashTabla *tabla, Tokens lista) {
-  printf("Conjunto extension\n");
+  if (lista.largo < 4) {
+    printf("Comando invalido\n");
+    return;
+  }
+
+  if (lista.palabras[2].tipo != corNumComa) {
+    printf("Comando invalido\n");
+    return;
+  }
+
+  AVLTree conjunto = itree_crear();
+
+  int numero = lista.palabras[2].numero;
+  conjunto = itree_insertar(conjunto, intervalo_crear(numero, numero));
+
+  int i = 3;
+
+  for (; lista.palabras[i].tipo == numComa; i++) {
+    numero = lista.palabras[i].numero;
+    conjunto = itree_insertar_disjutos(conjunto, intervalo_crear(numero, numero));
+  }
+
+  if (lista.palabras[i].tipo == numCor) {
+    numero = lista.palabras[i].numero;
+    conjunto = itree_insertar_disjutos(conjunto, intervalo_crear(numero, numero));
+    tabla = hash_insertar(tabla, lista.palabras[0].alias, conjunto);
+    return;
+  }
+  printf("Comando invalido\n");
+  itree_destruir(conjunto);
+
 }
 
 void insertar_conjunto_un_elem (HashTabla *tabla, char *alias, int numero) {
@@ -219,7 +251,7 @@ void insertar_conjunto_un_elem (HashTabla *tabla, char *alias, int numero) {
   if (intervalo_validar(intervalo))
     tabla = hash_insertar(tabla, alias, itree_insertar(NULL, intervalo));
   else
-    printf("Comando invalido\n");
+    printf("Elmento invalido\n");
 }
 
 void insertar_conjunto_vacio(HashTabla *tabla, char *alias) {
@@ -231,7 +263,7 @@ void insertar_complemento(HashTabla *tabla, char *aliasAlmacenar, char *alias) {
   if (operando)
      tabla = hash_insertar(tabla, aliasAlmacenar, itree_complemento(operando));
   else
-    printf("Comando invalido\n");
+    printf("Alias no almacenado\n");
   return;
 }
 
@@ -261,7 +293,7 @@ void insertar_operacion(HashTabla *tabla, Tokens lista) {
         break;
       }
       default: {
-        printf("Operacion invalid\n");
+        printf("Operacion invalida\n");
         break;
       }
     }
@@ -271,7 +303,6 @@ void insertar_operacion(HashTabla *tabla, Tokens lista) {
 }
 
 
-
 int parser(HashTabla * tabla, Tokens lista) {
   switch (lista.palabras[0].tipo) {
 
@@ -279,23 +310,20 @@ int parser(HashTabla * tabla, Tokens lista) {
       if (lista.largo == 1) {
         printf("Saliendo\n");
         return 0;
-      } else {
-        printf("Comando invalido\n");
-        return 1;
       }
+      break;
     }
 
     case imp: {
       if (lista.largo == 2) {
         imprimir_conjunto(tabla, lista.palabras[1].alias);
         return 1;
-      } else {
-        printf("Comando invalido\n");
-        return 1;
       }
+      break;
     }
 
     case alias: {
+
       if (lista.largo < 3 || lista.palabras[1].tipo != igual) {
         printf("Comando invalido\n");
         return 1;
@@ -313,50 +341,42 @@ int parser(HashTabla * tabla, Tokens lista) {
         }
 
         case corNumCor: {
-          if (lista.largo == 3)
+          if (lista.largo == 3) {
             insertar_conjunto_un_elem(tabla, lista.palabras[0].alias, lista.palabras[2].numero);
-          else
-            printf("Comando invalido\n");
-          return 1;
+            return 1;
+          }
         }
 
         case dobleCor: {
-          if (lista.largo == 3)
+          if (lista.largo == 3) {
             insertar_conjunto_vacio(tabla, lista.palabras[0].alias);
-          else
-            printf("Comando invalido\n");
-          return 1;
+            return 1;
+          }
         }
 
         case notAlias: {
-          if (lista.largo == 3)
+          if (lista.largo == 3) {
             insertar_complemento(tabla, lista.palabras[0].alias, lista.palabras[2].alias);
-          else
-            printf("Comando invalido\n");
-          return 1;
+            return 1;
+          }
         }
 
         case alias: {
-          if (lista.largo == 5)
+          if (lista.largo == 5) {
             insertar_operacion(tabla, lista);
-          else
-            printf("Comando invalido\n");
-          return 1;
+            return 1;
+          }
         }
 
-        default: {
-          printf("Comando invalido\n");
-          return 1;
-        }
+        default:
+          break;
       }
     }
 
-    default: {
-      printf("Comando invalido\n");
-      return 1;
-    }
-
+    default:
+      break;
   }
 
+  printf("Comando invalido\n");
   return 1;
 }
