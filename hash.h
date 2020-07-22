@@ -21,14 +21,17 @@ typedef struct {
     int size;
 } HashTabla;
 
+// hash_crear inicializa la estructura hash.
 HashTabla *hash_crear(int);
 
-HashTabla *hash_insertar(HashTabla *, char *, AVLTree);
+// hash_insertar inserta un conjunto en la tabla hash.
+// Si ya existe lo reemplaza.
+void hash_insertar(HashTabla *, char *, AVLTree);
 
+// hash_buscar retorna el conjunto con dicho alias si esta almacenado, NULL sino.
 AVLTree hash_buscar(HashTabla *, char *);
 
-void hash_eliminar(HashTabla *, char *);
-
+// hash_destuir libera la memoria reservada.
 void hash_destuir(HashTabla *);
 
 #endif

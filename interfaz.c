@@ -16,6 +16,7 @@ int es_un_numero (char *palabra) {
   return 1;
 }
 
+// Verifica si la palabra es un numero con un caracter al final.
 int es_un_numero_con_caracter(char *palabra, char caracter) {
   for (int i = 0; palabra[i]!= '\0'; i++) {
     if (isdigit(palabra[i]) == 0 && !(palabra[i] == '-' && i == 0)) {
@@ -28,6 +29,7 @@ int es_un_numero_con_caracter(char *palabra, char caracter) {
   return 1;
 }
 
+// Verifica que una palabra sea un alias.
 int alias_validar_sintaxis (char *alias) {
   for(int i = 0; alias[i]!= '\0'; i++) {
     if(isalpha(alias[i]) == 0 && isdigit(alias[i]) == 0)
@@ -36,10 +38,12 @@ int alias_validar_sintaxis (char *alias) {
   return 1;
 }
 
+// Retorna el conjunto asociado al alias si es que existe, sino NULL.
 AVLTree alias_validar (HashTabla *tabla, char *alias) {
   return hash_buscar(tabla, alias);
 }
 
+// Toma una palabra y crea un token asociado.
 Token token_crear (char *palabra) {
   Token token;
 
@@ -155,12 +159,15 @@ Token token_crear (char *palabra) {
     return token;
   } else {
     token.tipo = error;
+
     return token;
   }
 }
 
-Tokens token_lista_crear (char *linea) {
+Tokens tokens_lista_crear (char *linea) {
   Tokens lista;
+  // Se toma CAPACIDAD / 2 ya que la cantidad de
+  // palabras puede ser a lo sumo la mitad del largo total.
   lista.palabras = calloc(CAPACIDAD / 2, sizeof(Token *));
 
   char *palabra = strtok(linea, " ");
@@ -203,10 +210,10 @@ void insertar_conjunto_compresion (HashTabla *tabla, Tokens lista) {
   if (lista.palabras[3].tipo == num && lista.palabras[4].tipo == menorIgual && lista.palabras[5].tipo == x && lista.palabras[6].tipo == menorIgual && lista.palabras[7].tipo == numCor) {
     Intervalo intervalo = intervalo_crear(lista.palabras[3].numero, lista.palabras[7].numero);
     if (intervalo_validar(intervalo)) {
-      tabla = hash_insertar(tabla, lista.palabras[0].alias, itree_insertar(NULL, intervalo));
+      hash_insertar(tabla, lista.palabras[0].alias, itree_insertar(NULL, intervalo));
       return;
     }
-    tabla = hash_insertar(tabla, lista.palabras[0].alias, itree_insertar(NULL, VACIO));
+    hash_insertar(tabla, lista.palabras[0].alias, itree_insertar(NULL, VACIO));
     return;
   }
   printf("Comando invalido \n");
@@ -238,7 +245,7 @@ void insertar_conjunto_extension (HashTabla *tabla, Tokens lista) {
   if (lista.palabras[i].tipo == numCor) {
     numero = lista.palabras[i].numero;
     conjunto = itree_insertar_disjutos(conjunto, intervalo_crear(numero, numero));
-    tabla = hash_insertar(tabla, lista.palabras[0].alias, conjunto);
+    hash_insertar(tabla, lista.palabras[0].alias, conjunto);
     return;
   }
   printf("Comando invalido\n");
@@ -249,19 +256,19 @@ void insertar_conjunto_extension (HashTabla *tabla, Tokens lista) {
 void insertar_conjunto_un_elem (HashTabla *tabla, char *alias, int numero) {
   Intervalo intervalo = intervalo_crear(numero, numero);
   if (intervalo_validar(intervalo))
-    tabla = hash_insertar(tabla, alias, itree_insertar(NULL, intervalo));
+    hash_insertar(tabla, alias, itree_insertar(NULL, intervalo));
   else
     printf("Elmento invalido\n");
 }
 
 void insertar_conjunto_vacio(HashTabla *tabla, char *alias) {
-  tabla = hash_insertar(tabla, alias, itree_insertar(NULL, VACIO));
+  hash_insertar(tabla, alias, itree_insertar(NULL, VACIO));
 }
 
 void insertar_complemento(HashTabla *tabla, char *aliasAlmacenar, char *alias) {
   AVLTree operando = alias_validar(tabla, alias);
   if (operando)
-     tabla = hash_insertar(tabla, aliasAlmacenar, itree_complemento(operando));
+     hash_insertar(tabla, aliasAlmacenar, itree_complemento(operando));
   else
     printf("Alias no almacenado\n");
   return;
@@ -281,15 +288,15 @@ void insertar_operacion(HashTabla *tabla, Tokens lista) {
   if (operando1 && operando2) {
     switch (lista.palabras[3].tipo) {
       case resta: {
-        tabla = hash_insertar(tabla, lista.palabras[0].alias, itree_resta(operando1, operando2));
+        hash_insertar(tabla, lista.palabras[0].alias, itree_resta(operando1, operando2));
         break;
       }
       case inter: {
-        tabla = hash_insertar(tabla, lista.palabras[0].alias, itree_interseccion(operando1, operando2));
+        hash_insertar(tabla, lista.palabras[0].alias, itree_interseccion(operando1, operando2));
         break;
       }
       case unio: {
-        tabla = hash_insertar(tabla, lista.palabras[0].alias, itree_union(operando1, operando2));
+        hash_insertar(tabla, lista.palabras[0].alias, itree_union(operando1, operando2));
         break;
       }
       default: {
@@ -303,7 +310,7 @@ void insertar_operacion(HashTabla *tabla, Tokens lista) {
 }
 
 
-int parser(HashTabla * tabla, Tokens lista) {
+int ejecutar_comando(HashTabla * tabla, Tokens lista) {
   // switch sobre el tipo de la primir palabra
   switch (lista.palabras[0].tipo) {
 

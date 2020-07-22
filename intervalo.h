@@ -12,8 +12,13 @@ typedef struct _Intervalo {
 }Intervalo;
 
 void intervalo_imprimir(Intervalo);
+
 Intervalo intervalo_copiar(Intervalo);
+
 int intervalo_interseccion(Intervalo, Intervalo);
+
 Intervalo intervalo_crear(int, int);
+
 int intervalo_validar(Intervalo);
-#endif // INTERVALO_H_INCLUDED
+
+#endif

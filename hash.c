@@ -7,6 +7,7 @@
 
 
 HashTabla *hash_crear(int initial_size) {
+
   HashTabla *hash_tabla = malloc(sizeof(HashTabla));
   hash_tabla->size = initial_size;
   hash_tabla->tabla = calloc(initial_size, sizeof(HashDato));
@@ -14,6 +15,7 @@ HashTabla *hash_crear(int initial_size) {
   return hash_tabla;
 }
 
+// funcion de hasheo.
 int hash_hasheo(char *alias) {
   unsigned long hash = 5381;
   unsigned int c;
@@ -24,11 +26,11 @@ int hash_hasheo(char *alias) {
   return hash;
 }
 
-int comparar(char*a1, char*a2){
+int comparar(char *a1, char *a2){
   return strcmp(a1, a2) == 0;
 }
 
-HashTabla *hash_insertar(HashTabla *tabla, char *alias, AVLTree conjunto) {
+void hash_insertar(HashTabla *tabla, char *alias, AVLTree conjunto) {
   int key;
   HashNodo *nodoNuevo = NULL;
   // Se obtienen la key del alias.
@@ -38,7 +40,7 @@ HashTabla *hash_insertar(HashTabla *tabla, char *alias, AVLTree conjunto) {
     if (comparar(alias, aux->alias)){
       itree_destruir(aux->conjunto);
       aux->conjunto = conjunto;
-      return tabla;
+      return;
     }
   }
   // se setea el nuevo nodo
@@ -51,8 +53,6 @@ HashTabla *hash_insertar(HashTabla *tabla, char *alias, AVLTree conjunto) {
   tabla->tabla[key].lista = nodoNuevo;
   tabla->tabla[key].cantidad++;
 
-
-  return tabla;
 }
 
 AVLTree hash_buscar(HashTabla *tabla, char *alias) {
@@ -68,27 +68,6 @@ AVLTree hash_buscar(HashTabla *tabla, char *alias) {
     return NULL;
 
   return nodo->conjunto;
-}
-
-void hash_eliminar(HashTabla *tabla, char *alias) {
-  int key;
-  HashNodo *nodo;
-
-  key = hash_hasheo(alias) % tabla->size;
-  nodo = tabla->tabla[key].lista;
-
-  for(nodo = tabla->tabla[key].lista; nodo != NULL && comparar(alias, nodo->alias)!= 1; nodo = nodo->sig);
-
-  if(nodo == NULL) {
-    return;
-  }
-  if (nodo == tabla->tabla[key].lista) {
-    tabla->tabla[key].lista = nodo->sig;
-  }
-
-  free(nodo->alias);
-  itree_destruir(nodo->conjunto);
-  free(nodo);
 }
 
 void hash_destuir(HashTabla *tabla) {

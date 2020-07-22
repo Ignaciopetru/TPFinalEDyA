@@ -5,7 +5,7 @@
 #define CAPACIDAD 1024
 
 // 18 posibles tipos de token
-enum tipos{alias, igual, corNumComa, numComa, numCor, dobleCor, corNumCor, notAlias, imp, salir, unio, inter, resta, corX, num, x, menorIgual, error};
+enum Tipos{alias, igual, corNumComa, numComa, numCor, dobleCor, corNumCor, notAlias, imp, salir, unio, inter, resta, corX, num, x, menorIgual, error};
 
 typedef struct _Token {
   int tipo;
@@ -18,13 +18,16 @@ typedef struct _Tokens{
   int largo;
 }Tokens;
 
-Token token_crear (char *);
+// tokens_lista_crear toma una linea de texto
+// y devuelve la lista de tokens asociada.
+Tokens tokens_lista_crear (char *);
 
-Tokens token_lista_crear (char *);
-
+// tokens_destruir libera la memoria reservada.
 void tokens_destruir(Tokens);
 
-int parser(HashTabla *, Tokens);
+// ejecutar_comando toma una tabla hash y una estructura tokens y realiza la operacion
+// correspondiente de ser posible. Retorna 0 si el comando es salir, en otro caso 0.
+int ejecutar_comando(HashTabla *, Tokens);
 
 
 #endif
