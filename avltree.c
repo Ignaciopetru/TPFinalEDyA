@@ -284,9 +284,11 @@ void intervalo_resta (Intervalo a, Intervalo b, Intervalo *result1, Intervalo *r
 
 }
 
+// Devuelve un arbol con todos los intervalos interseccion de un intervalo.
 AVLTree  itree_todas_las_intersecciones (Intervalo intervalo, AVLTree arbol) {
 
   AVLTree resultado = itree_crear();
+  resultado = itree_insertar(resultado, VACIO);
 
   Intervalo * intervaloEnMemoria = malloc(sizeof(Intervalo));
   intervaloEnMemoria->inicio = intervalo.inicio;
@@ -305,7 +307,7 @@ AVLTree  itree_todas_las_intersecciones (Intervalo intervalo, AVLTree arbol) {
       Intervalo *result1 = malloc(sizeof(Intervalo));
       Intervalo *result2 = malloc(sizeof(Intervalo));
       intervalo_resta(*auxiliar, interseccion->intervalo, result1, result2);
-      resultado = itree_insertar_disjutos(resultado, intervalo_intervalo_interseccion(*auxiliar, interseccion->intervalo));
+      resultado = itree_union(resultado, itree_insertar(NULL, intervalo_intervalo_interseccion(*auxiliar, interseccion->intervalo)));
       if (!(result1->inicio == VACIO.inicio && result1->final == VACIO.final))
         stack_push(stack, result1);
       else
@@ -315,7 +317,6 @@ AVLTree  itree_todas_las_intersecciones (Intervalo intervalo, AVLTree arbol) {
       else
         free(result2);
     }
-
     free(auxiliar);
   }
 
@@ -340,7 +341,6 @@ AVLTree itree_interseccion(AVLTree a, AVLTree b) {
     conjuntoMasGrande = b;
     conjuntoMasChico = a;
   }
-
 
   Stack stack = stack_new();
   stack_push(stack, conjuntoMasChico);
