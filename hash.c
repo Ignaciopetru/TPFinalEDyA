@@ -18,7 +18,6 @@ HashTabla *hash_crear(int initial_size) {
 // Funcion de hasheo.
 int hash_obtener_key(char *alias) {
   unsigned long hash = 5381;
-  unsigned int c;
 
   for (int i = 0; alias[i]; i++)
     hash = ((hash << 5) + hash) + alias[i];

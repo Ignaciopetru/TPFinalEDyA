@@ -146,6 +146,10 @@ AVLTree itree_insertar(AVLTree arbol, Intervalo dato) {
   if (arbol == NULL) {
     return inodo_crear(dato);
   }
+  if (arbol->intervalo.inicio == VACIO.inicio && arbol->intervalo.final == VACIO.final) {
+    itree_destruir(arbol);
+    return inodo_crear(dato);
+  }
   // Buscamos la posicion que debe ocupar el nuevo nodo
   // segun BST, teniendo en cuenta ambos valores del intervalos.
   if (dato.inicio < arbol->intervalo.inicio)
@@ -245,13 +249,14 @@ AVLTree itree_union(AVLTree a, AVLTree b) {
   return arbol;
 }
 
-Intervalo intervalo_intervalo_interseccion(Intervalo intervaloA, Intervalo intervaloB) {
+Intervalo intervalo_intervalo_interseccion(Intervalo interA, Intervalo interB) {
   Intervalo resultado;
-  resultado.inicio = max(intervaloA.inicio, intervaloB.inicio);
-  resultado.final = min(intervaloA.final, intervaloB.final);
+  resultado.inicio = max(interA.inicio, interB.inicio);
+  resultado.final = min(interA.final, interB.final);
   return resultado;
 }
 
+// Toma dos intervalor y almacena en otros dos el resultado de la resta.
 void intervalo_resta (Intervalo a, Intervalo b, Intervalo *result1, Intervalo *result2) {
   if (a.inicio < b.inicio && a.final > b.final) {
     result1->inicio = a.inicio;
@@ -306,8 +311,11 @@ AVLTree  itree_todas_las_intersecciones (Intervalo intervalo, AVLTree arbol) {
     if (interseccion) {
       Intervalo *result1 = malloc(sizeof(Intervalo));
       Intervalo *result2 = malloc(sizeof(Intervalo));
+
       intervalo_resta(*auxiliar, interseccion->intervalo, result1, result2);
-      resultado = itree_union(resultado, itree_insertar(NULL, intervalo_intervalo_interseccion(*auxiliar, interseccion->intervalo)));
+
+      resultado = itree_insertar (resultado, intervalo_intervalo_interseccion(*auxiliar, interseccion->intervalo));
+
       if (!(result1->inicio == VACIO.inicio && result1->final == VACIO.final))
         stack_push(stack, result1);
       else
@@ -331,7 +339,7 @@ AVLTree itree_interseccion(AVLTree a, AVLTree b) {
     return itree_insertar(NULL, VACIO);
 
   AVLTree resultado = itree_crear();
-  resultado  = itree_insertar(resultado, VACIO);
+
   AVLTree conjuntoMasGrande, conjuntoMasChico;
 
   if (a->altura > b->altura) {
@@ -349,7 +357,10 @@ AVLTree itree_interseccion(AVLTree a, AVLTree b) {
     AVLTree nodo = stack_top(stack);
     stack_pop(stack);
 
-    resultado = itree_union(resultado, itree_todas_las_intersecciones(nodo->intervalo, conjuntoMasGrande));
+    AVLTree todasInter = itree_todas_las_intersecciones(nodo->intervalo, conjuntoMasGrande);
+
+    resultado = itree_recorrer_dfs(todasInter, itree_copiar_agregar, resultado);
+    itree_destruir(todasInter);
 
     if (nodo->izq != NULL)
       stack_push(stack, nodo->izq);
