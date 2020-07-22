@@ -66,6 +66,7 @@ AVLTree hash_buscar(HashTabla *tabla, char *alias) {
 
   if(nodo == NULL)
     return NULL;
+
   return nodo->conjunto;
 }
 

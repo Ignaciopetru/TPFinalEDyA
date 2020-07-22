@@ -283,7 +283,7 @@ AVLTree itree_interseccion(AVLTree a, AVLTree b) {
 
 AVLTree itree_complemento(AVLTree conjunto) {
   // Caso conjunto vacio.
-  if (conjunto->intervalo.inicio == 1 && conjunto->intervalo.final == -1)
+  if (conjunto->intervalo.inicio == VACIO.inicio && conjunto->intervalo.final == VACIO.final)
     return itree_insertar(NULL, intervalo_crear(-INFINITO, INFINITO));
   // Caso universo.
   if (conjunto->intervalo.inicio == -INFINITO && conjunto->intervalo.final == INFINITO)
@@ -417,10 +417,11 @@ AVLTree itree_recorrer_dfs(AVLTree arbol, Visitante visitante, AVLTree puntero) 
 
 AVLTree itree_recorrer_bfs(AVLTree arbol, Visitante visitante, AVLTree puntero) {
   Queue queue = queue_new();
-  queue_agregar(queue, arbol);
+  if(arbol)
+    queue_agregar(queue, arbol);
   while (!queue_isEmpty(queue)) {
     AVLTree nodo = queue_sacar(queue);
-    visitante(nodo, NULL);
+    visitante(nodo, puntero);
     if (nodo->izq != NULL)
       queue_agregar(queue, nodo->izq);
     if (nodo->der != NULL)
