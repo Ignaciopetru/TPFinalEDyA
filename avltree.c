@@ -255,22 +255,22 @@ Intervalo intervalo_intervalo_interseccion(Intervalo intervaloA, Intervalo inter
 void intervalo_resta (Intervalo a, Intervalo b, Intervalo *result1, Intervalo *result2) {
   if (a.inicio < b.inicio && a.final > b.final) {
     result1->inicio = a.inicio;
-    result1->final = b.inicio;
-    result2->inicio = b.final;
+    result1->final = b.inicio - 1;
+    result2->inicio = b.final + 1;
     result2->final = a.final;
     return;
   }
 
-  if (a.inicio < b.inicio && a.final < b.final) {
+  if (a.inicio < b.inicio && a.final <= b.final) {
     result1->inicio = a.inicio;
-    result1->final = b.inicio;
+    result1->final = b.inicio - 1;
     result2->inicio = VACIO.inicio;
     result2->final = VACIO.final;
     return;
   }
 
-  if (a.final > b.final && a.inicio > b.inicio) {
-    result1->inicio = b.inicio;
+  if (a.final > b.final && a.inicio >= b.inicio) {
+    result1->inicio = b.final + 1;
     result1->final = a.final;
     result2->inicio = VACIO.inicio;
     result2->final = VACIO.final;
