@@ -140,7 +140,7 @@ Token token_crear (char *palabra) {
   } else if (palabra[0] == '~') {
     if (alias_validar_sintaxis(palabra + 1)) {
       token.tipo = notAlias;
-      token.alias = malloc(sizeof(char) * (strlen(palabra) - 1));
+      token.alias = malloc(sizeof(char) * strlen(palabra));
       token.alias = strcpy(token.alias, palabra + 1);
     } else {
       token.tipo = error;
@@ -149,7 +149,7 @@ Token token_crear (char *palabra) {
     return token;
   } else if (alias_validar_sintaxis(palabra)) {
     token.tipo = alias;
-    token.alias = malloc(sizeof(char) * strlen(palabra));
+    token.alias = malloc(sizeof(char) * (strlen(palabra) + 1));
     token.alias = strcpy(token.alias, palabra);
 
     return token;
@@ -304,6 +304,7 @@ void insertar_operacion(HashTabla *tabla, Tokens lista) {
 
 
 int parser(HashTabla * tabla, Tokens lista) {
+  // switch sobre el tipo de la primir palabra
   switch (lista.palabras[0].tipo) {
 
     case salir: {
@@ -328,7 +329,7 @@ int parser(HashTabla * tabla, Tokens lista) {
         printf("Comando invalido\n");
         return 1;
       }
-
+      // switch sobre el tipo de la tercer palabra
       switch (lista.palabras[2].tipo) {
         case corX: {
           insertar_conjunto_compresion(tabla, lista);
@@ -345,6 +346,7 @@ int parser(HashTabla * tabla, Tokens lista) {
             insertar_conjunto_un_elem(tabla, lista.palabras[0].alias, lista.palabras[2].numero);
             return 1;
           }
+          break;
         }
 
         case dobleCor: {
@@ -352,6 +354,7 @@ int parser(HashTabla * tabla, Tokens lista) {
             insertar_conjunto_vacio(tabla, lista.palabras[0].alias);
             return 1;
           }
+          break;
         }
 
         case notAlias: {
@@ -359,6 +362,7 @@ int parser(HashTabla * tabla, Tokens lista) {
             insertar_complemento(tabla, lista.palabras[0].alias, lista.palabras[2].alias);
             return 1;
           }
+          break;
         }
 
         case alias: {

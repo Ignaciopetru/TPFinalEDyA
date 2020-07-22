@@ -21,7 +21,7 @@ int main() {
     buffer[strlen(buffer)-1] = '\0';
     Tokens lista = token_lista_crear(buffer);
     salir = parser(tabla, lista);
-    //tokens_destruir(lista);
+    tokens_destruir(lista);
     }
   }
   hash_destuir(tabla);
