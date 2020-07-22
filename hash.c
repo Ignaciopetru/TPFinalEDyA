@@ -15,13 +15,13 @@ HashTabla *hash_crear(int initial_size) {
   return hash_tabla;
 }
 
-// funcion de hasheo.
-int hash_hasheo(char *alias) {
+// Funcion de hasheo.
+int hash_obtener_key(char *alias) {
   unsigned long hash = 5381;
   unsigned int c;
 
-  while ((c = (*alias++)))
-    hash = ((hash << 5) + hash) + c;
+  for (int i = 0; alias[i]; i++)
+    hash = ((hash << 5) + hash) + alias[i];
 
   return hash;
 }
@@ -34,7 +34,7 @@ void hash_insertar(HashTabla *tabla, char *alias, AVLTree conjunto) {
   int key;
   HashNodo *nodoNuevo = NULL;
   // Se obtienen la key del alias.
-  key = hash_hasheo(alias) % tabla->size;
+  key = hash_obtener_key(alias) % tabla->size;
 
   for (HashNodo *aux = tabla->tabla[key].lista; aux != NULL; aux = aux->sig) {
     if (comparar(alias, aux->alias)){
@@ -59,7 +59,7 @@ AVLTree hash_buscar(HashTabla *tabla, char *alias) {
   int key;
   HashNodo *nodo;
 
-  key = hash_hasheo(alias) % tabla->size;
+  key = hash_obtener_key(alias) % tabla->size;
 
   // Busca en la lista.
   for(nodo = tabla->tabla[key].lista; nodo != NULL && comparar(alias, nodo->alias)!= 1; nodo = nodo->sig);

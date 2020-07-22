@@ -88,7 +88,7 @@ Token token_crear (char *palabra) {
     return token;
 
   } else if (es_un_numero(palabra)) {
-    int numero = atoi(palabra);
+    int numero = strtol(palabra, NULL, 10);
     if (numero == 0 && strlen(palabra) != 1) {
       token.tipo = error;
     } else {
@@ -99,7 +99,7 @@ Token token_crear (char *palabra) {
     return token;
   } else if (es_un_numero_con_caracter(palabra, ',') == 1) {
     palabra[strlen(palabra)] = '\0';
-    int numero = atoi(palabra);
+    int numero = strtol(palabra, NULL, 10);
     if (numero == 0 && strlen(palabra) != 2) {
       token.tipo = error;
     } else {
@@ -110,7 +110,7 @@ Token token_crear (char *palabra) {
     return token;
   } else if (es_un_numero_con_caracter(palabra, '}')) {
     palabra[strlen(palabra)] = '\0';
-    int numero = atoi(palabra);
+    int numero = strtol(palabra, NULL, 10);
     if (numero == 0 && strlen(palabra) != 2) {
       token.tipo = error;
     } else {
@@ -121,7 +121,7 @@ Token token_crear (char *palabra) {
     return token;
   } else if (palabra[0] == '{' && es_un_numero_con_caracter(palabra + 1, ',')) {
     palabra[strlen(palabra)] = '\0';
-    int numero = atoi(palabra + 1);
+    int numero = strtol(palabra + 1, NULL, 10);
     if (numero == 0 && strlen(palabra) != 3) {
       token.tipo = error;
     } else {
@@ -132,7 +132,7 @@ Token token_crear (char *palabra) {
     return token;
   } else if (palabra[0] == '{' && es_un_numero_con_caracter(palabra + 1, '}')) {
     palabra[strlen(palabra)] = '\0';
-    int numero = atoi(palabra + 1);
+    int numero = strtol(palabra + 1, NULL, 10);
     if (numero == 0 && strlen(palabra) != 3) {
       token.tipo = error;
     } else {
@@ -271,7 +271,6 @@ void insertar_complemento(HashTabla *tabla, char *aliasAlmacenar, char *alias) {
      hash_insertar(tabla, aliasAlmacenar, itree_complemento(operando));
   else
     printf("Alias no almacenado\n");
-  return;
 }
 
 void insertar_operacion(HashTabla *tabla, Tokens lista) {
