@@ -7,18 +7,6 @@
 
 // Funciones auxiliares --------------------------------------------------------
 
-
-int max(int a, int b) {
-  if (a > b)
-    return a;
-  return b;
-}
-int min(int a, int b) {
-  if (a < b)
-    return a;
-  return b;
-}
-
 int obtener_altura(AVLTree arbol) {
   if (arbol)
     return arbol->altura;
@@ -252,52 +240,6 @@ AVLTree itree_union(AVLTree a, AVLTree b) {
   return arbol;
 }
 
-
-Intervalo intervalo_valor_interseccion(Intervalo interA, Intervalo interB) {
-  Intervalo resultado;
-  resultado.inicio = max(interA.inicio, interB.inicio);
-  resultado.final = min(interA.final, interB.final);
-  return resultado;
-}
-
-// Toma dos intervalor y almacena en otros dos el resultado de la resta.
-void intervalo_resta (Intervalo a, Intervalo b, Intervalo *result1, Intervalo *result2) {
-
-  // b contenido en a
-  if (a.inicio < b.inicio && a.final > b.final) {
-    result1->inicio = a.inicio;
-    result1->final = b.inicio - 1;
-    result2->inicio = b.final + 1;
-    result2->final = a.final;
-    return;
-  }
-
-  // a sobresale por izquierda
-  if (a.inicio < b.inicio && a.final <= b.final) {
-    result1->inicio = a.inicio;
-    result1->final = b.inicio - 1;
-    result2->inicio = VACIO.inicio;
-    result2->final = VACIO.final;
-    return;
-  }
-
-  // a sobresale por derecha
-  if (a.final > b.final && a.inicio >= b.inicio) {
-    result1->inicio = b.final + 1;
-    result1->final = a.final;
-    result2->inicio = VACIO.inicio;
-    result2->final = VACIO.final;
-    return;
-  }
-
-  // a contenido en b
-  result1->inicio = VACIO.inicio;
-  result1->final = VACIO.final;
-  result2->inicio = VACIO.inicio;
-  result2->final = VACIO.final;
-
-}
-
 // Devuelve un arbol con todos los intervalos interseccion de un intervalo.
 AVLTree  itree_todas_las_intersecciones (Intervalo intervalo, AVLTree arbol) {
 
@@ -311,22 +253,30 @@ AVLTree  itree_todas_las_intersecciones (Intervalo intervalo, AVLTree arbol) {
   stack_push(stack, intervaloEnMemoria);
 
   while (!stack_isEmpty(stack)) {
+
     Intervalo *auxiliar = stack_top(stack);
     stack_pop(stack);
     AVLTree interseccion = itree_intersecar(arbol, *auxiliar);
 
     if (interseccion) {
+      // intervalos resta.
       Intervalo *result1 = malloc(sizeof(Intervalo));
       Intervalo *result2 = malloc(sizeof(Intervalo));
 
       intervalo_resta(*auxiliar, interseccion->intervalo, result1, result2);
 
-      resultado = itree_insertar_disjutos(resultado, intervalo_valor_interseccion(*auxiliar, interseccion->intervalo));
+      resultado = itree_insertar_disjutos(resultado,
+                                          intervalo_valor_interseccion(
+                                            *auxiliar,
+                                            interseccion->intervalo));
 
+      // Si le resta retorna elmentos, se deben volver a interseccionar con el
+      // arbol para no perder elmentos de la interseccion.
       if (!(result1->inicio == VACIO.inicio && result1->final == VACIO.final))
         stack_push(stack, result1);
       else
         free(result1);
+
       if (!(result2->inicio == VACIO.inicio && result2->final == VACIO.final))
         stack_push(stack, result2);
       else
@@ -382,9 +332,6 @@ AVLTree itree_interseccion(AVLTree a, AVLTree b) {
 
   stack_destruir(stack);
 
-  if (resultado == NULL)
-    resultado = itree_insertar(resultado, VACIO);
-
   return resultado;
 }
 
@@ -398,23 +345,23 @@ AVLTree itree_complemento(AVLTree conjunto) {
     return itree_insertar(NULL, intervalo_crear(1, -1));
 
   AVLTree resultado = itree_crear();
-  Intervalo anterior = intervalo_crear(0, -INFINITO - 1);
+  Intervalo anterior = intervalo_crear(0, -INFINITO);
 
   // Recorrido en forma bfs inorder iterativo.
   Stack stack = stack_new();
   AVLTree actual = conjunto;
 
   while(actual != NULL || stack_isEmpty(stack) == 0) {
-
     while (actual) {
-    stack_push(stack, actual);
-    actual = actual->izq;
+      stack_push(stack, actual);
+      actual = actual->izq;
     }
 
     AVLTree temp = stack_top(stack);
     stack_pop(stack);
     actual = temp->der;
-
+    if (anterior.final == -INFINITO)
+      resultado = itree_insertar_disjutos(resultado, intervalo_crear(anterior.final, temp->intervalo.inicio - 1));
     resultado = itree_insertar_disjutos(resultado, intervalo_crear(anterior.final + 1, temp->intervalo.inicio - 1));
     anterior = temp->intervalo;
   }

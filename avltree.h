@@ -38,18 +38,22 @@ AVLTree itree_recorrer_dfs(AVLTree, Visitante, AVLTree);
 AVLTree itree_recorrer_bfs(AVLTree, Visitante, AVLTree);
 
 // intervalo_imprimir (visitante) imprime los valores de un intervalo dado.
-
-AVLTree itree_duplicar(AVLTree);
-
 void inodo_imprimir(AVLTree);
 
-
-
+// itree_insertar_disjutos inserta un intervalo en el arbol, pero de forma que
+// no tenga interseccion con ningun otro intervalo.
 AVLTree itree_insertar_disjutos (AVLTree, Intervalo);
 
-
+// itree_union toma dos arboles y retorna uno que es la union.
 AVLTree itree_union(AVLTree, AVLTree);
+
+// itree_interseccion toma dos arboles y retorna uno que es la interseccion.
 AVLTree itree_interseccion(AVLTree, AVLTree);
+
+// itree_complemento toma dos arboles y retorna su complemento.
 AVLTree itree_complemento(AVLTree);
+
+// itree_resta toma dos arboles y retorna uno que es la resta.
 AVLTree itree_resta(AVLTree, AVLTree);
+
 #endif

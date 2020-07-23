@@ -11,14 +11,29 @@ typedef struct _Intervalo {
     int final;
 }Intervalo;
 
-void intervalo_imprimir(Intervalo);
+int max(int a, int b);
 
-Intervalo intervalo_copiar(Intervalo);
+int min(int a, int b);
 
-int intervalo_interseccion(Intervalo, Intervalo);
-
+// intervalo_crear toma dos ints y crea una estructura intervalo.
 Intervalo intervalo_crear(int, int);
 
+// intervalo_validar valida si el intervalo es correcto.
 int intervalo_validar(Intervalo);
+
+// intervalo_imprimir imprime en pantalla el intervalo.
+void intervalo_imprimir(Intervalo);
+
+// intervalo_copiar retorna una estructura Intervalo igual a la pasada.
+Intervalo intervalo_copiar(Intervalo);
+
+// intervalo_interseccion determina si dos intervalos tienen interseccion.
+int intervalo_interseccion(Intervalo, Intervalo);
+
+// intervalo_valor_interseccion retorna el intervalo interseccion entre dos.
+Intervalo intervalo_valor_interseccion(Intervalo, Intervalo);
+
+// intervalo_resta toma dos intervalor y setea en dichos intervalos la resta.
+void intervalo_resta (Intervalo, Intervalo, Intervalo *, Intervalo *);
 
 #endif

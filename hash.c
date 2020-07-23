@@ -1,9 +1,7 @@
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <math.h>
 #include "hash.h"
-#include "lists/dlist/dlist.h"
+
 
 
 HashTabla *hash_crear(int initial_size) {
@@ -61,9 +59,10 @@ AVLTree hash_buscar(HashTabla *tabla, char *alias) {
   key = hash_obtener_key(alias) % tabla->size;
 
   // Busca en la lista.
-  for(nodo = tabla->tabla[key].lista; nodo != NULL && comparar(alias, nodo->alias)!= 1; nodo = nodo->sig);
+  for (nodo = tabla->tabla[key].lista;
+       nodo != NULL && comparar(alias, nodo->alias) != 1; nodo = nodo->sig);
 
-  if(nodo == NULL)
+  if (nodo == NULL)
     return NULL;
 
   return nodo->conjunto;

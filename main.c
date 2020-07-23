@@ -2,11 +2,12 @@
 #include <string.h>
 #include "interfaz.h"
 #include "hash.h"
+#define LARGO_TALBA 10
 
 int main() {
 
   int salir = 1;
-  HashTabla * tabla = hash_crear(10);
+  HashTabla * tabla = hash_crear(LARGO_TALBA);
   printf("Interfaz 2.0\n");
 
   while (salir) {
