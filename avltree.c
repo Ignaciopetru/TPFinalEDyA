@@ -185,6 +185,7 @@ AVLTree itree_insertar_disjutos (AVLTree arbol, Intervalo intervalo) {
   return itree_insertar(arbol, intervalo);
 }
 
+// Nodo resultado de intersecar un nodo con un arbol.
 AVLTree itree_intersecar(AVLTree arbol, Intervalo intervalo) {
   if (arbol == NULL)
     return arbol;
@@ -224,6 +225,8 @@ AVLTree itree_intersecar(AVLTree arbol, Intervalo intervalo) {
     return itree_intersecar(arbol->der, intervalo);
 }
 
+// Funcion visitante, para agregar los nodos de un arbol en otro.
+// Se utiliza con alguna funcion de recorrido.
 AVLTree itree_copiar_agregar(AVLTree origen, AVLTree destino) {
   destino = itree_insertar_disjutos(destino,
                                     intervalo_copiar(origen->intervalo));
@@ -249,7 +252,8 @@ AVLTree itree_union(AVLTree a, AVLTree b) {
   return arbol;
 }
 
-Intervalo intervalo_intervalo_interseccion(Intervalo interA, Intervalo interB) {
+
+Intervalo intervalo_valor_interseccion(Intervalo interA, Intervalo interB) {
   Intervalo resultado;
   resultado.inicio = max(interA.inicio, interB.inicio);
   resultado.final = min(interA.final, interB.final);
@@ -258,6 +262,8 @@ Intervalo intervalo_intervalo_interseccion(Intervalo interA, Intervalo interB) {
 
 // Toma dos intervalor y almacena en otros dos el resultado de la resta.
 void intervalo_resta (Intervalo a, Intervalo b, Intervalo *result1, Intervalo *result2) {
+
+  // b contenido en a
   if (a.inicio < b.inicio && a.final > b.final) {
     result1->inicio = a.inicio;
     result1->final = b.inicio - 1;
@@ -266,6 +272,7 @@ void intervalo_resta (Intervalo a, Intervalo b, Intervalo *result1, Intervalo *r
     return;
   }
 
+  // a sobresale por izquierda
   if (a.inicio < b.inicio && a.final <= b.final) {
     result1->inicio = a.inicio;
     result1->final = b.inicio - 1;
@@ -274,6 +281,7 @@ void intervalo_resta (Intervalo a, Intervalo b, Intervalo *result1, Intervalo *r
     return;
   }
 
+  // a sobresale por derecha
   if (a.final > b.final && a.inicio >= b.inicio) {
     result1->inicio = b.final + 1;
     result1->final = a.final;
@@ -282,6 +290,7 @@ void intervalo_resta (Intervalo a, Intervalo b, Intervalo *result1, Intervalo *r
     return;
   }
 
+  // a contenido en b
   result1->inicio = VACIO.inicio;
   result1->final = VACIO.final;
   result2->inicio = VACIO.inicio;
@@ -292,8 +301,7 @@ void intervalo_resta (Intervalo a, Intervalo b, Intervalo *result1, Intervalo *r
 // Devuelve un arbol con todos los intervalos interseccion de un intervalo.
 AVLTree  itree_todas_las_intersecciones (Intervalo intervalo, AVLTree arbol) {
 
-  AVLTree resultado = itree_crear();
-  resultado = itree_insertar(resultado, VACIO);
+  AVLTree resultado = itree_insertar(NULL, VACIO);
 
   Intervalo * intervaloEnMemoria = malloc(sizeof(Intervalo));
   intervaloEnMemoria->inicio = intervalo.inicio;
@@ -305,7 +313,6 @@ AVLTree  itree_todas_las_intersecciones (Intervalo intervalo, AVLTree arbol) {
   while (!stack_isEmpty(stack)) {
     Intervalo *auxiliar = stack_top(stack);
     stack_pop(stack);
-
     AVLTree interseccion = itree_intersecar(arbol, *auxiliar);
 
     if (interseccion) {
@@ -314,7 +321,7 @@ AVLTree  itree_todas_las_intersecciones (Intervalo intervalo, AVLTree arbol) {
 
       intervalo_resta(*auxiliar, interseccion->intervalo, result1, result2);
 
-      resultado = itree_insertar (resultado, intervalo_intervalo_interseccion(*auxiliar, interseccion->intervalo));
+      resultado = itree_insertar_disjutos(resultado, intervalo_valor_interseccion(*auxiliar, interseccion->intervalo));
 
       if (!(result1->inicio == VACIO.inicio && result1->final == VACIO.final))
         stack_push(stack, result1);
@@ -325,22 +332,24 @@ AVLTree  itree_todas_las_intersecciones (Intervalo intervalo, AVLTree arbol) {
       else
         free(result2);
     }
+
     free(auxiliar);
   }
 
   stack_destruir(stack);
   return resultado;
-
 }
 
 AVLTree itree_interseccion(AVLTree a, AVLTree b) {
 
-  if ((a->intervalo.inicio == VACIO.inicio && a->intervalo.final == VACIO.final) || (b->intervalo.inicio == VACIO.inicio && b->intervalo.final == VACIO.final))
+  // Caso conjuntos vacio.
+  if ((a->intervalo.inicio == VACIO.inicio &&
+       a->intervalo.final == VACIO.final) ||
+      (b->intervalo.inicio == VACIO.inicio &&
+       b->intervalo.final == VACIO.final))
     return itree_insertar(NULL, VACIO);
 
-  AVLTree resultado = itree_crear();
-
-  AVLTree conjuntoMasGrande, conjuntoMasChico;
+  AVLTree conjuntoMasGrande, conjuntoMasChico, resultado = itree_crear();
 
   if (a->altura > b->altura) {
     conjuntoMasGrande = a;
@@ -357,8 +366,11 @@ AVLTree itree_interseccion(AVLTree a, AVLTree b) {
     AVLTree nodo = stack_top(stack);
     stack_pop(stack);
 
-    AVLTree todasInter = itree_todas_las_intersecciones(nodo->intervalo, conjuntoMasGrande);
+    // Todas las intersecciones del intervalo actual.
+    AVLTree todasInter = itree_todas_las_intersecciones(nodo->intervalo,
+                                                        conjuntoMasGrande);
 
+    // Se agregan al resultado final.
     resultado = itree_recorrer_dfs(todasInter, itree_copiar_agregar, resultado);
     itree_destruir(todasInter);
 
@@ -369,11 +381,13 @@ AVLTree itree_interseccion(AVLTree a, AVLTree b) {
   }
 
   stack_destruir(stack);
+
   if (resultado == NULL)
     resultado = itree_insertar(resultado, VACIO);
 
   return resultado;
 }
+
 
 AVLTree itree_complemento(AVLTree conjunto) {
   // Caso conjunto vacio.
@@ -413,6 +427,7 @@ AVLTree itree_complemento(AVLTree conjunto) {
 }
 
 AVLTree itree_resta(AVLTree a, AVLTree b) {
+
   AVLTree complemento2 = itree_complemento(b);
   AVLTree resultado = itree_interseccion(a, complemento2);
   itree_destruir(complemento2);
