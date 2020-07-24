@@ -3,26 +3,26 @@ all: main
 main: main.c stack.o queue.o dlist.o avltree.o hash.o interfaz.o intervalo.o
 	gcc  -std=c99 -o main main.c hash.o avltree.o stack.o queue.o dlist.o interfaz.o intervalo.o -lm
 
-interfaz.o: interfaz.c interfaz.h hash.o avltree.o
-	gcc -c -Wall -Wextra -Werror -std=c99 interfaz.c
+interfaz.o: manejoAlias/interfaz.c manejoAlias/interfaz.h hash.o avltree.o
+	gcc -c -Wall -Wextra -Werror -std=c99 manejoAlias/interfaz.c
 
-hash.o: hash.c hash.h
-	gcc -c -Wall -Wextra -Werror -std=c99 hash.c
+hash.o: manejoAlias/hash.c manejoAlias/hash.h
+	gcc -c -Wall -Wextra -Werror -std=c99 manejoAlias/hash.c
 
-avltree.o: avltree.c avltree.h stack.o queue.o dlist.o
-	gcc -c -Wall -Wextra -Werror -std=c99 avltree.c
+avltree.o: arbolDeIntervalos/avltree.c arbolDeIntervalos/avltree.h stack.o queue.o dlist.o
+	gcc -c -Wall -Wextra -Werror -std=c99 arbolDeIntervalos/avltree.c
 
-intervalo.o: intervalo.c intervalo.h
-	gcc -c -c -Wall -Wextra -Werror -std=c99 intervalo.c
+intervalo.o: arbolDeIntervalos/intervalo.c arbolDeIntervalos/intervalo.h
+	gcc -c -c -Wall -Wextra -Werror -std=c99 arbolDeIntervalos/intervalo.c
 
-stack.o: lists/stack.c lists/stack.h dlist.o
-	gcc -c -c -Wall -Wextra -Werror -std=c99 lists/stack.c
+stack.o: arbolDeIntervalos/lists/stack.c arbolDeIntervalos/lists/stack.h dlist.o
+	gcc -c -c -Wall -Wextra -Werror -std=c99 arbolDeIntervalos/lists/stack.c
 
-queue.o: lists/queue.c lists/queue.h dlist.o
-	gcc -c -c -Wall -Wextra -Werror -std=c99 lists/queue.c
+queue.o: arbolDeIntervalos/lists/queue.c arbolDeIntervalos/lists/queue.h dlist.o
+	gcc -c -c -Wall -Wextra -Werror -std=c99 arbolDeIntervalos/lists/queue.c
 
-dlist.o: lists/dlist/dlist.c lists/dlist/dlist.h
-	gcc -c -c -Wall -Wextra -Werror -std=c99 lists/dlist/dlist.c
+dlist.o: arbolDeIntervalos/lists/dlist/dlist.c arbolDeIntervalos/lists/dlist/dlist.h
+	gcc -c -c -Wall -Wextra -Werror -std=c99 arbolDeIntervalos/lists/dlist/dlist.c
 
 clean:
 	rm -f *.o main main.exe

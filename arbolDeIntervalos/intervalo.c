@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "intervalo.h"
 
 int max(int a, int b) {

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
-#include "interfaz.h"
-#include "hash.h"
+#include "manejoAlias/interfaz.h"
+#include "manejoAlias/hash.h"
 #define LARGO_TALBA 10
 
 int main() {

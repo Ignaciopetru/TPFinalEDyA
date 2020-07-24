@@ -3,9 +3,9 @@
 #include <ctype.h>
 #include <string.h>
 #include "interfaz.h"
-#include "avltree.h"
+#include "../arbolDeIntervalos/avltree.h"
 #include "hash.h"
-#include "intervalo.h"
+#include "../arbolDeIntervalos/intervalo.h"
 
 
 int es_un_numero (char *palabra) {

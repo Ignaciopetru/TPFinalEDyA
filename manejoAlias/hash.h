@@ -1,6 +1,6 @@
 #ifndef HASH_H_INCLUDED
 #define HASH_H_INCLUDED
-#include "avltree.h"
+#include "../arbolDeIntervalos/avltree.h"
 
 // Nodo de la lista
 typedef struct _HashNodo {
