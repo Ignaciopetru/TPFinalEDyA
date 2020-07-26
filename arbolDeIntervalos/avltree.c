@@ -243,49 +243,26 @@ AVLTree itree_union(AVLTree a, AVLTree b) {
 // Devuelve un arbol con todos los intervalos interseccion de un intervalo.
 AVLTree  itree_todas_las_intersecciones (Intervalo intervalo, AVLTree arbol) {
 
-  AVLTree resultado = itree_insertar(NULL, VACIO);
-
-  Intervalo * intervaloEnMemoria = malloc(sizeof(Intervalo));
-  intervaloEnMemoria->inicio = intervalo.inicio;
-  intervaloEnMemoria->final = intervalo.final;
-
+  AVLTree resultado = NULL;
   Stack stack = stack_new();
-  stack_push(stack, intervaloEnMemoria);
+  if (arbol)
+    stack_push(stack, arbol);
 
   while (!stack_isEmpty(stack)) {
-
-    Intervalo *auxiliar = stack_top(stack);
+    AVLTree interseccion = itree_intersecar(stack_top(stack), intervalo);
     stack_pop(stack);
-    AVLTree interseccion = itree_intersecar(arbol, *auxiliar);
 
     if (interseccion) {
-      // intervalos resta.
-      Intervalo *result1 = malloc(sizeof(Intervalo));
-      Intervalo *result2 = malloc(sizeof(Intervalo));
-
-      intervalo_resta(*auxiliar, interseccion->intervalo, result1, result2);
-
-      resultado = itree_insertar_disjutos(resultado,
-                                          intervalo_valor_interseccion(
-                                            *auxiliar,
-                                            interseccion->intervalo));
-
-      // Si le resta retorna elmentos, se deben volver a interseccionar con el
-      // arbol para no perder elmentos de la interseccion.
-      if (!(result1->inicio == VACIO.inicio && result1->final == VACIO.final))
-        stack_push(stack, result1);
-      else
-        free(result1);
-
-      if (!(result2->inicio == VACIO.inicio && result2->final == VACIO.final))
-        stack_push(stack, result2);
-      else
-        free(result2);
+      resultado  = itree_insertar(resultado, intervalo_valor_interseccion(interseccion->intervalo, intervalo));
+      if (interseccion->izq)
+        stack_push(stack, interseccion->izq);
+      if (interseccion->der)
+        stack_push(stack, interseccion->der);
     }
-
-    free(auxiliar);
   }
 
+  if (!resultado)
+    resultado = itree_insertar(resultado, VACIO);
   stack_destruir(stack);
   return resultado;
 }

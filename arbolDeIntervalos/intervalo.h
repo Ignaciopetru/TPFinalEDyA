@@ -33,7 +33,4 @@ int intervalo_interseccion(Intervalo, Intervalo);
 // intervalo_valor_interseccion retorna el intervalo interseccion entre dos.
 Intervalo intervalo_valor_interseccion(Intervalo, Intervalo);
 
-// intervalo_resta toma dos intervalor y setea en dichos intervalos la resta.
-void intervalo_resta (Intervalo, Intervalo, Intervalo *, Intervalo *);
-
 #endif
