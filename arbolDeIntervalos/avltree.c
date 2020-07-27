@@ -227,7 +227,8 @@ AVLTree itree_intersecar(AVLTree arbol, Intervalo intervalo) {
 // Funcion visitante, para agregar los nodos de un arbol en otro.
 // Se utiliza con alguna funcion de recorrido.
 AVLTree itree_copiar_agregar(AVLTree origen, AVLTree destino) {
-  if (origen->intervalo.inicio == VACIO.inicio && origen->intervalo.final == VACIO.final && destino)
+  if (origen->intervalo.inicio == VACIO.inicio &&
+      origen->intervalo.final == VACIO.final && destino)
     return destino;
   destino = itree_insertar_disjutos(destino, origen->intervalo);
   return destino;
@@ -281,6 +282,7 @@ AVLTree  itree_todas_las_intersecciones (Intervalo intervalo, AVLTree arbol) {
 
   stack_destruir(stack);
 
+  // Si no se encuentra ninguna interseccion el resultado es vacio.
   if (!resultado) {
     resultado = itree_insertar(resultado, VACIO);
   }
@@ -361,6 +363,7 @@ AVLTree itree_complemento(AVLTree conjunto) {
     AVLTree temp = stack_top(stack);
     stack_pop(stack);
     actual = temp->der;
+
     // Realizo el caso particular de -INFINITO, para no salir del rango minimo
     // de ints.
     if (anterior.final == -INFINITO)
@@ -373,7 +376,6 @@ AVLTree itree_complemento(AVLTree conjunto) {
   resultado = itree_insertar(resultado, intervalo_crear(anterior.final + 1, INFINITO));
 
   return resultado;
-
 }
 
 AVLTree itree_resta(AVLTree a, AVLTree b) {
@@ -387,7 +389,7 @@ AVLTree itree_resta(AVLTree a, AVLTree b) {
   return resultado;
 }
 
-// Funciones destrucción. -----------------------------------------------------
+// Funciones destrucción. ------------------------------------------------------
 
 AVLTree itree_eliminar(AVLTree arbol, Intervalo dato) {
   if (arbol == NULL) {
