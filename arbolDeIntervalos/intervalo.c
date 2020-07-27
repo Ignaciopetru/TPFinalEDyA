@@ -44,8 +44,7 @@ void intervalo_imprimir(Intervalo intervalo) {
   else if (intervalo.final == INFINITO)
     printf("%d:inf ", intervalo.final);
   else
-
-  printf("%d:%d ", intervalo.inicio, intervalo.final);
+    printf("%d:%d ", intervalo.inicio, intervalo.final);
 }
 
 int intervalo_validar(Intervalo intervalo) {

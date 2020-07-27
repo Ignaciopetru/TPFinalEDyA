@@ -111,6 +111,7 @@ AVLTree inodo_crear(Intervalo intervalo) {
   return nodo;
 }
 
+// Devuelve un nodo identico al argumento.
 AVLTree itree_duplicar(AVLTree arbol) {
   if (arbol == NULL)
     return NULL;
@@ -161,15 +162,26 @@ AVLTree itree_insertar(AVLTree arbol, Intervalo dato) {
 
 }
 
+// Inserta un intervalo, pero de forma de que nunca haya en el arbol intervalos
+// con interseccion no nula.
 AVLTree itree_insertar_disjutos (AVLTree arbol, Intervalo intervalo) {
 
+  // Se chequea si el intervalo tiene interseccion con algun nodo del arbol.
+  // Se agranda el intervalo, pues si hay dos intervalos contiguos me interesa
+  // unirlos, de forma que la cantidad de nodos sea la menor posible.
   AVLTree interseccion = itree_intersecar(arbol,intervalo_crear(intervalo.inicio - 1, intervalo.final + 1));
+
   while (interseccion != NULL) {
+    // Si se encuentra interseccion, se elimina ese nodo y se modifica el
+    // intervalo a insertar de manera que contenga ambos.
     intervalo.inicio = min(intervalo.inicio, interseccion->intervalo.inicio);
     intervalo.final = max(intervalo.final, interseccion->intervalo.final);
     arbol = itree_eliminar(arbol, interseccion->intervalo);
     interseccion = itree_intersecar(arbol, intervalo_crear(intervalo.inicio - 1, intervalo.final + 1));
   }
+
+  // Una vez eliminadas todas las intersecciones y modificado el intervalo,
+  // se inserta en el arbol.
   return itree_insertar(arbol, intervalo);
 }
 
@@ -189,7 +201,6 @@ AVLTree itree_intersecar(AVLTree arbol, Intervalo intervalo) {
     else
       return NULL;
   }
-
   // Intervalo es completamente mayor que el intervalo del nodo
 
   // Primer subcaso:
@@ -216,13 +227,14 @@ AVLTree itree_intersecar(AVLTree arbol, Intervalo intervalo) {
 // Funcion visitante, para agregar los nodos de un arbol en otro.
 // Se utiliza con alguna funcion de recorrido.
 AVLTree itree_copiar_agregar(AVLTree origen, AVLTree destino) {
-  destino = itree_insertar_disjutos(destino,
-                                    intervalo_copiar(origen->intervalo));
+  destino = itree_insertar_disjutos(destino, origen->intervalo);
   return destino;
 }
 
 AVLTree itree_union(AVLTree a, AVLTree b) {
-  AVLTree arbol = itree_crear();
+
+  AVLTree arbol;
+
   if (a->intervalo.inicio == VACIO.inicio && a->intervalo.final == VACIO.final)
     return itree_duplicar(b);
   if (b->intervalo.inicio == VACIO.inicio && b->intervalo.final == VACIO.final)
@@ -231,6 +243,7 @@ AVLTree itree_union(AVLTree a, AVLTree b) {
   // Duplicar es menos costoso que insertar, duplico el arbol mas grande.
   if(a->altura > b->altura) {
     arbol = itree_duplicar(a);
+    // Se agregan los intervalos del otro arbol (conjunto).
     arbol = itree_recorrer_dfs(b, itree_copiar_agregar, arbol);
     return arbol;
   }
@@ -254,6 +267,9 @@ AVLTree  itree_todas_las_intersecciones (Intervalo intervalo, AVLTree arbol) {
 
     if (interseccion) {
       resultado  = itree_insertar(resultado, intervalo_valor_interseccion(interseccion->intervalo, intervalo));
+      // Si un intervalo tiene interseccion con alguno del arbol, al ser
+      // intervalos disjuntos, las otras posibles intersecciones estan en los
+      // hijos del nodo interseccion.
       if (interseccion->izq)
         stack_push(stack, interseccion->izq);
       if (interseccion->der)
@@ -261,9 +277,12 @@ AVLTree  itree_todas_las_intersecciones (Intervalo intervalo, AVLTree arbol) {
     }
   }
 
-  if (!resultado)
-    resultado = itree_insertar(resultado, VACIO);
   stack_destruir(stack);
+
+  if (!resultado) {
+    resultado = itree_insertar(resultado, VACIO);
+  }
+
   return resultado;
 }
 
@@ -278,6 +297,8 @@ AVLTree itree_interseccion(AVLTree a, AVLTree b) {
 
   AVLTree conjuntoMasGrande, conjuntoMasChico, resultado = itree_crear();
 
+  // Combiene recorrer el arbol mas chico, pues intersecar un intervalo suele
+  // ser menos costoso.
   if (a->altura > b->altura) {
     conjuntoMasGrande = a;
     conjuntoMasChico = b;
@@ -324,7 +345,8 @@ AVLTree itree_complemento(AVLTree conjunto) {
   AVLTree resultado = itree_crear();
   Intervalo anterior = intervalo_crear(0, -INFINITO);
 
-  // Recorrido en forma bfs inorder iterativo.
+  // Recorrido en forma inorder iterativo.
+  // de esta forma, recorremos del menor intervalo al mayor.
   Stack stack = stack_new();
   AVLTree actual = conjunto;
 
@@ -337,6 +359,8 @@ AVLTree itree_complemento(AVLTree conjunto) {
     AVLTree temp = stack_top(stack);
     stack_pop(stack);
     actual = temp->der;
+    // Realizo el caso particular de -INFINITO, para no salir del rango minimo
+    // de ints.
     if (anterior.final == -INFINITO)
       resultado = itree_insertar_disjutos(resultado, intervalo_crear(anterior.final, temp->intervalo.inicio - 1));
     resultado = itree_insertar_disjutos(resultado, intervalo_crear(anterior.final + 1, temp->intervalo.inicio - 1));
@@ -350,8 +374,13 @@ AVLTree itree_complemento(AVLTree conjunto) {
 
 }
 
+
+  
+
 AVLTree itree_resta(AVLTree a, AVLTree b) {
 
+  // Propiedad de la resta de conjuntos.
+  // A - B = A & (~B)
   AVLTree complemento2 = itree_complemento(b);
   AVLTree resultado = itree_interseccion(a, complemento2);
   itree_destruir(complemento2);
@@ -383,15 +412,15 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo dato) {
         temp = arbol;
         free(temp);
         arbol = NULL;
-      } else {// Caso un hijo
-
+      } else {
+        // Caso un hijo
         arbol->intervalo = temp->intervalo;
         arbol->izq = temp->izq;
         arbol->der = temp->der;
         free(temp);
-
       }
-    } else {  // Caso dos hijos
+    } else {
+      // Caso dos hijos
       // Busco el nodo menor del hijo derecho
       AVLTree actual = arbol->der;
       while (actual->izq != NULL)
@@ -416,8 +445,6 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo dato) {
   return balancear(arbol, balance);
 }
 
-// Segundo argumento debe ser NULL
-
 void itree_destruir(AVLTree arbol) {
   if (arbol) {
     itree_destruir(arbol->der);
@@ -426,12 +453,14 @@ void itree_destruir(AVLTree arbol) {
   free(arbol);
 }
 
-// Funciones recorrer ----------------------------------------------------------
+// Funciones recorridos --------------------------------------------------------
 
 void inodo_imprimir(AVLTree nodo) {
   intervalo_imprimir(nodo->intervalo);
 }
 
+// Se iguala el parametro puntero a la ejecucion de la funcion visitante sobre
+// el nodo actual del arbol.
 AVLTree itree_recorrer_dfs(AVLTree arbol, Visitante visitante, AVLTree puntero){
   Stack stack = stack_new();
   if (arbol)
@@ -445,10 +474,13 @@ AVLTree itree_recorrer_dfs(AVLTree arbol, Visitante visitante, AVLTree puntero){
     if (nodo->izq != NULL)
       stack_push(stack, nodo->izq);
   }
+
   stack_destruir(stack);
   return puntero;
 }
 
+// Se iguala el parametro puntero a la ejecucion de la funcion visitante sobre
+// el nodo actual del arbol.
 AVLTree itree_recorrer_bfs(AVLTree arbol, Visitante visitante, AVLTree puntero){
   Queue queue = queue_new();
   if (arbol)

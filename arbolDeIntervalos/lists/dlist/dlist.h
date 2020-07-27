@@ -1,6 +1,12 @@
 #ifndef LIST_H_INLCUDED
 #define LIST_H_INLCUDED
 
+struct _DNodo {
+  void *dato;
+  struct _DNodo *sig, *ant;
+};
+
+
 // Estructura que representa un nodo en la lista enlazada,
 // cuyo dato es una personta
 typedef struct _DNodo DNodo;

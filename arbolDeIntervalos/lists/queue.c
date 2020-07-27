@@ -28,10 +28,25 @@ void queue_agregar(Queue queue, void *dato) {
 }
 
 void *queue_sacar(Queue queue) {
+  // Queue vacia.
   if (queue->primero == NULL)
     return NULL;
+
   void *dato = dnodo_dato(queue->ultimo);
-  queue->ultimo = dnodo_ant(queue->ultimo);
+  DList anteUltimo = dnodo_ant(queue->ultimo);
+
+  // Un solo elemento en la queue.
+  if (anteUltimo == NULL) {
+    dlist_destruir(queue->ultimo, NULL);
+    queue->primero = NULL;
+    queue->ultimo = NULL;
+    return dato;
+  }
+
+  anteUltimo->sig = NULL;
+  dlist_destruir(queue->ultimo, NULL);
+  queue->ultimo = anteUltimo;
+
   return dato;
 }
 

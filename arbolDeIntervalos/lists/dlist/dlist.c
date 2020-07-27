@@ -2,11 +2,6 @@
 #include <stdlib.h>
 #include "dlist.h"
 
-struct _DNodo {
-  void *dato;
-  struct _DNodo *sig, *ant;
-};
-
 DList dlist_crear() {
   return NULL;
 }
