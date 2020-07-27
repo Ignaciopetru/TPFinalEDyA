@@ -227,6 +227,8 @@ AVLTree itree_intersecar(AVLTree arbol, Intervalo intervalo) {
 // Funcion visitante, para agregar los nodos de un arbol en otro.
 // Se utiliza con alguna funcion de recorrido.
 AVLTree itree_copiar_agregar(AVLTree origen, AVLTree destino) {
+  if (origen->intervalo.inicio == VACIO.inicio && origen->intervalo.final == VACIO.final && destino)
+    return destino;
   destino = itree_insertar_disjutos(destino, origen->intervalo);
   return destino;
 }
