@@ -374,9 +374,6 @@ AVLTree itree_complemento(AVLTree conjunto) {
 
 }
 
-
-  
-
 AVLTree itree_resta(AVLTree a, AVLTree b) {
 
   // Propiedad de la resta de conjuntos.

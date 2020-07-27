@@ -10,7 +10,9 @@ typedef struct _AVLNodo {
     struct _AVLNodo *izq;
 }AVLNodo;
 
-typedef struct _AVLNodo * AVLTree;
+  typedef struct _AVLNodo * AVLTree;
+
+void inorder (AVLTree);
 
 typedef AVLTree (*Visitante) (AVLTree, AVLTree);
 
