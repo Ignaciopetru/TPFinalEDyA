@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "hash.h"
@@ -18,7 +19,7 @@ int hash_obtener_key(char *alias) {
   unsigned long hash = 5381;
 
   for (int i = 0; alias[i]; i++)
-    hash = ((hash << 5) + hash) + alias[i];
+    hash = (33 * hash) + alias[i];
 
   return hash;
 }
@@ -76,11 +77,12 @@ void hash_destuir(HashTabla *tabla) {
     nodo = tabla->tabla[i].lista;
 
     while(nodo != NULL) {
-        nodoSig = nodo->sig;
-        free(nodo->alias);
-        itree_destruir(nodo->conjunto);
-        free(nodo);
-        nodo = nodoSig;
+      printf("nodo %d", i);
+      nodoSig = nodo->sig;
+      free(nodo->alias);
+      itree_destruir(nodo->conjunto);
+      free(nodo);
+      nodo = nodoSig;
     }
   }
 
