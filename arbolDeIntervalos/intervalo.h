@@ -9,7 +9,7 @@
 typedef struct _Intervalo {
     int inicio;
     int final;
-}Intervalo;
+}   Intervalo;
 
 int max(int a, int b);
 

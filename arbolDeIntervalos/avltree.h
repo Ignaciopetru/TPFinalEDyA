@@ -8,9 +8,9 @@ typedef struct _AVLNodo {
     int mayorFinal;
     struct _AVLNodo *der;
     struct _AVLNodo *izq;
-}AVLNodo;
+} AVLNodo;
 
-  typedef struct _AVLNodo * AVLTree;
+typedef struct _AVLNodo * AVLTree;
 
 void inorder (AVLTree);
 
