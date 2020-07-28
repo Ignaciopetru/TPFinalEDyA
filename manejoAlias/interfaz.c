@@ -193,7 +193,7 @@ void tokens_destruir(Tokens lista) {
 void imprimir_conjunto(HashTabla * tabla, char *alias) {
   AVLTree conjunto = alias_validar(tabla, alias);
   if (conjunto) {
-    itree_recorrer_bfs(conjunto, (Visitante)inodo_imprimir, NULL);
+    itree_recorrer_inorder(conjunto, (Visitante)inodo_imprimir);
     puts("");
   }
   else

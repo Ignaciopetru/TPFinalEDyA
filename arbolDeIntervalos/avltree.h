@@ -58,4 +58,7 @@ AVLTree itree_complemento(AVLTree);
 // itree_resta toma dos arboles y retorna uno que es la resta.
 AVLTree itree_resta(AVLTree, AVLTree);
 
+// itree_recorrer_inorder recorre el arbol de forma inorder y ejecuta la funcion
+void itree_recorrer_inorder(AVLTree, Visitante);
+
 #endif

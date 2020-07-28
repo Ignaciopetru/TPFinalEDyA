@@ -460,6 +460,17 @@ void inodo_imprimir(AVLTree nodo) {
   intervalo_imprimir(nodo->intervalo);
 }
 
+
+void itree_recorrer_inorder(AVLTree arbol, Visitante visitante) {
+  if (arbol == NULL)
+    return;
+  if (arbol->izq)
+    itree_recorrer_inorder(arbol->izq, visitante);
+  visitante (arbol, NULL);
+  if (arbol->der)
+    itree_recorrer_inorder(arbol->der, visitante);
+}
+
 // Se iguala el parametro puntero a la ejecucion de la funcion visitante sobre
 // el nodo actual del arbol.
 AVLTree itree_recorrer_dfs(AVLTree arbol, Visitante visitante, AVLTree puntero){
