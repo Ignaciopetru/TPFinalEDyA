@@ -8,6 +8,7 @@
 #include "../arbolDeIntervalos/intervalo.h"
 
 
+// Chequea que una string sea una cadena de numeros.
 int es_un_numero (char *palabra) {
   for(int i = 0; palabra[i]!= '\0'; i++) {
     if(isdigit(palabra[i]) == 0 && !(palabra[i] == '-' && i == 0))
@@ -16,9 +17,11 @@ int es_un_numero (char *palabra) {
   return 1;
 }
 
+
 // Verifica si la palabra es un numero con un caracter al final.
 int es_un_numero_con_caracter(char *palabra, char caracter) {
   for (int i = 0; palabra[i]!= '\0'; i++) {
+    // Numero o - de negativo
     if (isdigit(palabra[i]) == 0 && !(palabra[i] == '-' && i == 0)) {
       if (palabra[i] == caracter && palabra[i+1] == '\0')
         return 1;
@@ -29,6 +32,7 @@ int es_un_numero_con_caracter(char *palabra, char caracter) {
   return 1;
 }
 
+
 // Verifica que una palabra sea un alias.
 int alias_validar_sintaxis (char *alias) {
   for(int i = 0; alias[i]!= '\0'; i++) {
@@ -38,10 +42,12 @@ int alias_validar_sintaxis (char *alias) {
   return 1;
 }
 
+
 // Retorna el conjunto asociado al alias si es que existe, sino NULL.
 AVLTree alias_validar (HashTabla *tabla, char *alias) {
   return hash_buscar(tabla, alias);
 }
+
 
 // Toma una palabra y crea un token asociado.
 Token token_crear (char *palabra) {
@@ -164,6 +170,7 @@ Token token_crear (char *palabra) {
   }
 }
 
+
 Tokens tokens_lista_crear (char *linea) {
   Tokens lista;
   // Se toma CAPACIDAD / 2 ya que la cantidad de
@@ -182,6 +189,8 @@ Tokens tokens_lista_crear (char *linea) {
   return lista;
 }
 
+
+// Libera la lista de tokens, liberando los alias si es necesario.
 void tokens_destruir(Tokens lista) {
   for(int i = 0; i < lista.largo; i++) {
     if (lista.palabras[i].tipo == alias || lista.palabras[i].tipo == notAlias)
@@ -189,6 +198,7 @@ void tokens_destruir(Tokens lista) {
   }
   free(lista.palabras);
 }
+
 
 void imprimir_conjunto(HashTabla * tabla, char *alias) {
   AVLTree conjunto = alias_validar(tabla, alias);
@@ -201,25 +211,31 @@ void imprimir_conjunto(HashTabla * tabla, char *alias) {
 }
 
 
+// Lee la lista de tokens e inserta si es posible el intervalo definido.
 void insertar_conjunto_compresion (HashTabla *tabla, Tokens lista) {
   if (lista.largo != 8) {
     printf("Comando invalido \n");
     return;
   }
 
+  // Chequeo de completitud de la sintxis.
   if (lista.palabras[3].tipo == num && lista.palabras[4].tipo == menorIgual && lista.palabras[5].tipo == x && lista.palabras[6].tipo == menorIgual && lista.palabras[7].tipo == numCor) {
     Intervalo intervalo = intervalo_crear(lista.palabras[3].numero, lista.palabras[7].numero);
     if (intervalo_validar(intervalo)) {
       hash_insertar(tabla, lista.palabras[0].alias, itree_insertar(NULL, intervalo));
       return;
     }
+    // Si el inicio es mayor al final, el conjunto es el vacio.
     hash_insertar(tabla, lista.palabras[0].alias, itree_insertar(NULL, VACIO));
     return;
   }
   printf("Comando invalido \n");
 }
 
+
+// Lee la lista de tokens e inserta si es posible el intervalo definido.
 void insertar_conjunto_extension (HashTabla *tabla, Tokens lista) {
+  // Verificaciones que nos ahorran trabajo.
   if (lista.largo < 4) {
     printf("Comando invalido\n");
     return;
@@ -232,6 +248,7 @@ void insertar_conjunto_extension (HashTabla *tabla, Tokens lista) {
 
   AVLTree conjunto = itree_crear();
 
+  // Si la sitaxis es correcta se agregan los intervalos al arbol resultado.
   int numero = lista.palabras[2].numero;
   conjunto = itree_insertar(conjunto, intervalo_crear(numero, numero));
 
@@ -242,16 +259,19 @@ void insertar_conjunto_extension (HashTabla *tabla, Tokens lista) {
     conjunto = itree_insertar_disjutos(conjunto, intervalo_crear(numero, numero));
   }
 
+  // Si es correcto se alamacena en la tabla hash.
   if (lista.palabras[i].tipo == numCor) {
     numero = lista.palabras[i].numero;
     conjunto = itree_insertar_disjutos(conjunto, intervalo_crear(numero, numero));
     hash_insertar(tabla, lista.palabras[0].alias, conjunto);
     return;
   }
+  // Sino se libera y se notifica el error.
   printf("Comando invalido\n");
   itree_destruir(conjunto);
 
 }
+
 
 void insertar_conjunto_un_elem (HashTabla *tabla, char *alias, int numero) {
   Intervalo intervalo = intervalo_crear(numero, numero);
@@ -261,10 +281,13 @@ void insertar_conjunto_un_elem (HashTabla *tabla, char *alias, int numero) {
     printf("Elmento invalido\n");
 }
 
+
 void insertar_conjunto_vacio(HashTabla *tabla, char *alias) {
   hash_insertar(tabla, alias, itree_insertar(NULL, VACIO));
 }
 
+
+// Lee el comando y realiza el complemento.
 void insertar_complemento(HashTabla *tabla, char *aliasAlmacenar, char *alias) {
   AVLTree operando = alias_validar(tabla, alias);
   if (operando)
@@ -273,7 +296,9 @@ void insertar_complemento(HashTabla *tabla, char *aliasAlmacenar, char *alias) {
     printf("Alias no almacenado\n");
 }
 
+
 void insertar_operacion(HashTabla *tabla, Tokens lista) {
+  // Verificaciones que ahorran computo.
   if (lista.palabras[2].tipo != alias || lista.palabras[4].tipo != alias) {
     printf("Sintaxis invalida\n");
     return;
@@ -284,6 +309,7 @@ void insertar_operacion(HashTabla *tabla, Tokens lista) {
   }
   AVLTree operando1 = alias_validar(tabla, lista.palabras[2].alias);
   AVLTree operando2 = alias_validar(tabla, lista.palabras[4].alias);
+  // Se chequea que los alias funcionen.
   if (operando1 && operando2) {
     switch (lista.palabras[3].tipo) {
       case resta: {
@@ -299,6 +325,7 @@ void insertar_operacion(HashTabla *tabla, Tokens lista) {
         break;
       }
       default: {
+        // Caso operador desconocido.
         printf("Operacion invalida\n");
         break;
       }
@@ -310,7 +337,7 @@ void insertar_operacion(HashTabla *tabla, Tokens lista) {
 
 
 int ejecutar_comando(HashTabla * tabla, Tokens lista) {
-  // switch sobre el tipo de la primir palabra
+  // Switch sobre el tipo de la primir palabra.
   switch (lista.palabras[0].tipo) {
 
     case salir: {
@@ -335,7 +362,7 @@ int ejecutar_comando(HashTabla * tabla, Tokens lista) {
         printf("Comando invalido\n");
         return 1;
       }
-      // switch sobre el tipo de la tercer palabra
+      // Switch sobre el tipo de la tercer palabra.
       switch (lista.palabras[2].tipo) {
         case corX: {
           insertar_conjunto_compresion(tabla, lista);
