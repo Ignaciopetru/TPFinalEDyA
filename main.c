@@ -20,6 +20,7 @@ int main() {
       scanf("%*c");
     } else {
       buffer[strlen(buffer)-1] = '\0';
+      // Si no se exedio la capacidad, se tokeniza el comando.
       Tokens lista = tokens_lista_crear(buffer);
       salir = ejecutar_comando(tabla, lista);
       tokens_destruir(lista);

@@ -11,8 +11,10 @@ typedef struct _Intervalo {
     int final;
 }   Intervalo;
 
+// max toma dos int y devuelve el mayor.
 int max(int a, int b);
 
+// min toma dos int y devuelve el menor.
 int min(int a, int b);
 
 // intervalo_crear toma dos ints y crea una estructura intervalo.

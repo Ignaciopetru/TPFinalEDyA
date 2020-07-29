@@ -55,46 +55,37 @@ Token token_crear (char *palabra) {
 
   if (strcmp(palabra, "salir") == 0) {
     token.tipo = salir;
-    return token;
 
   } else if (strcmp(palabra, "imprimir") == 0) {
     token.tipo = imp;
-    return token;
 
   } else if (strcmp(palabra, "=") == 0) {
     token.tipo = igual;
-    return token;
 
   } else if (strcmp(palabra, "|") == 0) {
     token.tipo = unio;
-    return token;
 
   } else if (strcmp(palabra, "&") == 0) {
     token.tipo = inter;
-    return token;
 
   } else if (strcmp(palabra, "-") == 0) {
     token.tipo = resta;
-    return token;
 
   } else if (strcmp(palabra, "{x:") == 0) {
     token.tipo = corX;
-    return token;
 
   } else if (strcmp(palabra, "<=") == 0) {
     token.tipo = menorIgual;
-    return token;
 
   } else if (strcmp(palabra, "x") == 0) {
     token.tipo = x;
-    return token;
 
   } else if (strcmp(palabra, "{}") == 0) {
     token.tipo = dobleCor;
-    return token;
 
   } else if (es_un_numero(palabra)) {
     int numero = strtol(palabra, NULL, 10);
+    // Chequeo de que la funcion strtol no haya dado error.
     if (numero == 0 && strlen(palabra) != 1) {
       token.tipo = error;
     } else {
@@ -102,10 +93,10 @@ Token token_crear (char *palabra) {
       token.numero = numero;
     }
 
-    return token;
   } else if (es_un_numero_con_caracter(palabra, ',') == 1) {
     palabra[strlen(palabra)] = '\0';
     int numero = strtol(palabra, NULL, 10);
+    // Chequeo de que la funcion strtol no haya dado error.
     if (numero == 0 && strlen(palabra) != 2) {
       token.tipo = error;
     } else {
@@ -113,10 +104,10 @@ Token token_crear (char *palabra) {
       token.numero = numero;
     }
 
-    return token;
   } else if (es_un_numero_con_caracter(palabra, '}')) {
     palabra[strlen(palabra)] = '\0';
     int numero = strtol(palabra, NULL, 10);
+    // Chequeo de que la funcion strtol no haya dado error.
     if (numero == 0 && strlen(palabra) != 2) {
       token.tipo = error;
     } else {
@@ -124,10 +115,10 @@ Token token_crear (char *palabra) {
       token.numero = numero;
     }
 
-    return token;
   } else if (palabra[0] == '{' && es_un_numero_con_caracter(palabra + 1, ',')) {
     palabra[strlen(palabra)] = '\0';
     int numero = strtol(palabra + 1, NULL, 10);
+    // Chequeo de que la funcion strtol no haya dado error.
     if (numero == 0 && strlen(palabra) != 3) {
       token.tipo = error;
     } else {
@@ -135,10 +126,10 @@ Token token_crear (char *palabra) {
       token.numero = numero;
     }
 
-    return token;
   } else if (palabra[0] == '{' && es_un_numero_con_caracter(palabra + 1, '}')) {
     palabra[strlen(palabra)] = '\0';
     int numero = strtol(palabra + 1, NULL, 10);
+    // Chequeo de que la funcion strtol no haya dado error.
     if (numero == 0 && strlen(palabra) != 3) {
       token.tipo = error;
     } else {
@@ -146,7 +137,6 @@ Token token_crear (char *palabra) {
       token.numero = numero;
     }
 
-    return token;
   } else if (palabra[0] == '~') {
     if (alias_validar_sintaxis(palabra + 1)) {
       token.tipo = notAlias;
@@ -156,18 +146,16 @@ Token token_crear (char *palabra) {
       token.tipo = error;
     }
 
-    return token;
   } else if (alias_validar_sintaxis(palabra)) {
     token.tipo = alias;
     token.alias = malloc(sizeof(char) * (strlen(palabra) + 1));
     token.alias = strcpy(token.alias, palabra);
 
-    return token;
   } else {
     token.tipo = error;
 
-    return token;
   }
+  return token;
 }
 
 
@@ -180,6 +168,7 @@ Tokens tokens_lista_crear (char *linea) {
   char *palabra = strtok(linea, " ");
 
   int i;
+  // Se clasifica cada palabra en un token.
   for (i = 0; palabra != NULL; i++) {
     lista.palabras[i] = token_crear(palabra);
     palabra = strtok(NULL, " ");
@@ -203,6 +192,7 @@ void tokens_destruir(Tokens lista) {
 void imprimir_conjunto(HashTabla * tabla, char *alias) {
   AVLTree conjunto = alias_validar(tabla, alias);
   if (conjunto) {
+    // Se muestra el conjunto en orden
     itree_recorrer_inorder(conjunto, (Visitante)inodo_imprimir);
     puts("");
   }
@@ -222,6 +212,7 @@ void insertar_conjunto_compresion (HashTabla *tabla, Tokens lista) {
   if (lista.palabras[3].tipo == num && lista.palabras[4].tipo == menorIgual && lista.palabras[5].tipo == x && lista.palabras[6].tipo == menorIgual && lista.palabras[7].tipo == numCor) {
     Intervalo intervalo = intervalo_crear(lista.palabras[3].numero, lista.palabras[7].numero);
     if (intervalo_validar(intervalo)) {
+      // Si el intervalo es valido
       hash_insertar(tabla, lista.palabras[0].alias, itree_insertar(NULL, intervalo));
       return;
     }
@@ -276,6 +267,7 @@ void insertar_conjunto_extension (HashTabla *tabla, Tokens lista) {
 void insertar_conjunto_un_elem (HashTabla *tabla, char *alias, int numero) {
   Intervalo intervalo = intervalo_crear(numero, numero);
   if (intervalo_validar(intervalo))
+    // Se chequea que el numero este dentro el rando -INFINITO, INFINITO.
     hash_insertar(tabla, alias, itree_insertar(NULL, intervalo));
   else
     printf("Elmento invalido\n");
@@ -290,6 +282,7 @@ void insertar_conjunto_vacio(HashTabla *tabla, char *alias) {
 // Lee el comando y realiza el complemento.
 void insertar_complemento(HashTabla *tabla, char *aliasAlmacenar, char *alias) {
   AVLTree operando = alias_validar(tabla, alias);
+  // Si operando es NULL, el alias no esta almacenado.
   if (operando)
      hash_insertar(tabla, aliasAlmacenar, itree_complemento(operando));
   else
@@ -338,6 +331,7 @@ void insertar_operacion(HashTabla *tabla, Tokens lista) {
 
 int ejecutar_comando(HashTabla * tabla, Tokens lista) {
   // Switch sobre el tipo de la primir palabra.
+  // Segun el tipo se ve que operacion se debe realizar.
   switch (lista.palabras[0].tipo) {
 
     case salir: {
@@ -363,6 +357,7 @@ int ejecutar_comando(HashTabla * tabla, Tokens lista) {
         return 1;
       }
       // Switch sobre el tipo de la tercer palabra.
+      // Dependiendo de este tipo, ejecutamos distintas acciones.
       switch (lista.palabras[2].tipo) {
         case corX: {
           insertar_conjunto_compresion(tabla, lista);

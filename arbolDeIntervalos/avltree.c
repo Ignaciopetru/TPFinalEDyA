@@ -135,7 +135,8 @@ AVLTree itree_insertar(AVLTree arbol, Intervalo dato) {
   if (arbol == NULL) {
     return inodo_crear(dato);
   }
-  if (arbol->intervalo.inicio == VACIO.inicio && arbol->intervalo.final == VACIO.final) {
+  if (arbol->intervalo.inicio == VACIO.inicio &&
+      arbol->intervalo.final == VACIO.final) {
     itree_destruir(arbol);
     return inodo_crear(dato);
   }
@@ -149,12 +150,12 @@ AVLTree itree_insertar(AVLTree arbol, Intervalo dato) {
     arbol->izq = itree_insertar(arbol->izq, dato);
   else if (dato.final > arbol->intervalo.final)
     arbol->der = itree_insertar(arbol->der, dato);
-  // Caso en el que el nodo ya este en el arbol.
+    // Caso en el que el nodo ya este en el arbol.
   else
     return arbol;
   // Recalculamos la altura de cada nuevo nodo.
   arbol->altura =
-      1 + max(obtener_altura(arbol->izq), obtener_altura(arbol->der));
+    1 + max(obtener_altura(arbol->izq), obtener_altura(arbol->der));
   arbol->mayorFinal = obtener_mayorFinal(arbol);
   // Calculamos el valor de balance de el nodo y procedemos a balancear.
   int balance = obtener_balance(arbol);
@@ -169,7 +170,8 @@ AVLTree itree_insertar_disjutos (AVLTree arbol, Intervalo intervalo) {
   // Se chequea si el intervalo tiene interseccion con algun nodo del arbol.
   // Se agranda el intervalo, pues si hay dos intervalos contiguos me interesa
   // unirlos, de forma que la cantidad de nodos sea la menor posible.
-  AVLTree interseccion = itree_intersecar(arbol,intervalo_crear(intervalo.inicio - 1, intervalo.final + 1));
+  Intervalo intAum = intervalo_crear(intervalo.inicio - 1, intervalo.final + 1);
+  AVLTree interseccion = itree_intersecar(arbol, intAum);
 
   while (interseccion != NULL) {
     // Si se encuentra interseccion, se elimina ese nodo y se modifica el
@@ -177,7 +179,10 @@ AVLTree itree_insertar_disjutos (AVLTree arbol, Intervalo intervalo) {
     intervalo.inicio = min(intervalo.inicio, interseccion->intervalo.inicio);
     intervalo.final = max(intervalo.final, interseccion->intervalo.final);
     arbol = itree_eliminar(arbol, interseccion->intervalo);
-    interseccion = itree_intersecar(arbol, intervalo_crear(intervalo.inicio - 1, intervalo.final + 1));
+    // intA es el intervalo aumentado, recorte el nombre para que no supere
+    // 80 caracteres.
+    Intervalo intA = intervalo_crear(intervalo.inicio - 1, intervalo.final + 1);
+    interseccion = itree_intersecar(arbol, intA);
   }
 
   // Una vez eliminadas todas las intersecciones y modificado el intervalo,
@@ -227,6 +232,7 @@ AVLTree itree_intersecar(AVLTree arbol, Intervalo intervalo) {
 // Funcion visitante, para agregar los nodos de un arbol en otro.
 // Se utiliza con alguna funcion de recorrido.
 AVLTree itree_copiar_agregar(AVLTree origen, AVLTree destino) {
+  // Caso origen vacio, no se agrega nada.
   if (origen->intervalo.inicio == VACIO.inicio &&
       origen->intervalo.final == VACIO.final && destino)
     return destino;
@@ -235,9 +241,8 @@ AVLTree itree_copiar_agregar(AVLTree origen, AVLTree destino) {
 }
 
 AVLTree itree_union(AVLTree a, AVLTree b) {
-
   AVLTree arbol;
-
+  // Caso alguno vacio.
   if (a->intervalo.inicio == VACIO.inicio && a->intervalo.final == VACIO.final)
     return itree_duplicar(b);
   if (b->intervalo.inicio == VACIO.inicio && b->intervalo.final == VACIO.final)
@@ -257,7 +262,7 @@ AVLTree itree_union(AVLTree a, AVLTree b) {
 }
 
 // Devuelve un arbol con todos los intervalos interseccion de un intervalo.
-AVLTree  itree_todas_las_intersecciones (Intervalo intervalo, AVLTree arbol) {
+AVLTree  itree_todas_las_intersecciones (Intervalo intervaloDato, AVLTree arbol) {
 
   AVLTree resultado = NULL;
   Stack stack = stack_new();
@@ -265,11 +270,12 @@ AVLTree  itree_todas_las_intersecciones (Intervalo intervalo, AVLTree arbol) {
     stack_push(stack, arbol);
 
   while (!stack_isEmpty(stack)) {
-    AVLTree interseccion = itree_intersecar(stack_top(stack), intervalo);
+    AVLTree interseccion = itree_intersecar(stack_top(stack), intervaloDato);
     stack_pop(stack);
 
     if (interseccion) {
-      resultado  = itree_insertar(resultado, intervalo_valor_interseccion(interseccion->intervalo, intervalo));
+      resultado = itree_insertar(resultado, intervalo_valor_interseccion(
+        interseccion->intervalo, intervaloDato));
       // Si un intervalo tiene interseccion con alguno del arbol, al ser
       // intervalos disjuntos, las otras posibles intersecciones estan en los
       // hijos del nodo interseccion.

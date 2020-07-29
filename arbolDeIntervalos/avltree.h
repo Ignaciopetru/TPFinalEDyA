@@ -12,8 +12,7 @@ typedef struct _AVLNodo {
 
 typedef struct _AVLNodo * AVLTree;
 
-void inorder (AVLTree);
-
+// Tipo de funcion visitante
 typedef AVLTree (*Visitante) (AVLTree, AVLTree);
 
 // itree_crear inicializa el nuevo arbol de intervalos.
@@ -39,6 +38,9 @@ AVLTree itree_recorrer_dfs(AVLTree, Visitante, AVLTree);
 // itree_recorrer_dfs recorre el arbol de la forma bfs.
 AVLTree itree_recorrer_bfs(AVLTree, Visitante, AVLTree);
 
+// itree_recorrer_inorder recorre el arbol de forma inorder y ejecuta la funcion
+void itree_recorrer_inorder(AVLTree, Visitante);
+
 // intervalo_imprimir (visitante) imprime los valores de un intervalo dado.
 void inodo_imprimir(AVLTree);
 
@@ -57,8 +59,5 @@ AVLTree itree_complemento(AVLTree);
 
 // itree_resta toma dos arboles y retorna uno que es la resta.
 AVLTree itree_resta(AVLTree, AVLTree);
-
-// itree_recorrer_inorder recorre el arbol de forma inorder y ejecuta la funcion
-void itree_recorrer_inorder(AVLTree, Visitante);
 
 #endif
