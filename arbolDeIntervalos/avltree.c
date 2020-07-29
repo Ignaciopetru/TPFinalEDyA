@@ -367,12 +367,14 @@ AVLTree itree_complemento(AVLTree conjunto) {
     // Realizo el caso particular de -INFINITO, para no salir del rango minimo
     // de ints.
     if (anterior.final == -INFINITO)
-      resultado = itree_insertar_disjutos(resultado, intervalo_crear(anterior.final, temp->intervalo.inicio - 1));
-    resultado = itree_insertar_disjutos(resultado, intervalo_crear(anterior.final + 1, temp->intervalo.inicio - 1));
+      resultado = itree_insertar(resultado, intervalo_crear(anterior.final, temp->intervalo.inicio - 1));
+    else
+      resultado = itree_insertar(resultado, intervalo_crear(anterior.final + 1, temp->intervalo.inicio - 1));
     anterior = temp->intervalo;
   }
 
   stack_destruir(stack);
+
   resultado = itree_insertar(resultado, intervalo_crear(anterior.final + 1, INFINITO));
 
   return resultado;

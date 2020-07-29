@@ -77,7 +77,6 @@ void hash_destuir(HashTabla *tabla) {
     nodo = tabla->tabla[i].lista;
 
     while(nodo != NULL) {
-      printf("nodo %d", i);
       nodoSig = nodo->sig;
       free(nodo->alias);
       itree_destruir(nodo->conjunto);

@@ -42,7 +42,7 @@ void intervalo_imprimir(Intervalo intervalo) {
   else if (intervalo.inicio == -INFINITO)
     printf("-inf:%d ", intervalo.final);
   else if (intervalo.final == INFINITO)
-    printf("%d:inf ", intervalo.final);
+    printf("%d:inf ", intervalo.inicio);
   else
     printf("%d:%d ", intervalo.inicio, intervalo.final);
 }

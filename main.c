@@ -2,7 +2,7 @@
 #include <string.h>
 #include "manejoAlias/interfaz.h"
 #include "manejoAlias/hash.h"
-#define LARGO_TALBA 10
+#define LARGO_TALBA 1500
 
 int main() {
 
