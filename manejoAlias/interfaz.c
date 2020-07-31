@@ -49,6 +49,15 @@ AVLTree alias_validar (HashTabla *tabla, char *alias) {
 }
 
 
+// Chequear que el numero este en el universo a trabajar.
+int long_chequear_int(long numero, char *palabra, int largoDebido) {
+  if (numero > INT_MAX || numero < INT_MIN ||
+      (numero == 0 && strlen(palabra) != largoDebido))
+    return 0;
+  return 1;
+}
+
+
 // Toma una palabra y crea un token asociado.
 Token token_crear (char *palabra) {
   Token token;
@@ -84,57 +93,58 @@ Token token_crear (char *palabra) {
     token.tipo = dobleCor;
 
   } else if (es_un_numero(palabra)) {
-    int numero = strtol(palabra, NULL, 10);
+    long numero = strtol(palabra, NULL, 10);
     // Chequeo de que la funcion strtol no haya dado error.
-    if (numero == 0 && strlen(palabra) != 1) {
+    if (!long_chequear_int(numero, palabra, 1)) {
       token.tipo = error;
     } else {
       token.tipo = num;
-      token.numero = numero;
+      // Numero esta en el rando de los ints
+      token.numero = (int) numero;
     }
 
   } else if (es_un_numero_con_caracter(palabra, ',') == 1) {
     palabra[strlen(palabra)] = '\0';
-    int numero = strtol(palabra, NULL, 10);
+    long numero = strtol(palabra, NULL, 10);
     // Chequeo de que la funcion strtol no haya dado error.
-    if (numero == 0 && strlen(palabra) != 2) {
+    if (!long_chequear_int(numero, palabra, 2)) {
       token.tipo = error;
     } else {
       token.tipo = numComa;
-      token.numero = numero;
+      token.numero = (int) numero;
     }
 
   } else if (es_un_numero_con_caracter(palabra, '}')) {
     palabra[strlen(palabra)] = '\0';
-    int numero = strtol(palabra, NULL, 10);
+    long numero = strtol(palabra, NULL, 10);
     // Chequeo de que la funcion strtol no haya dado error.
-    if (numero == 0 && strlen(palabra) != 2) {
+    if (!long_chequear_int(numero, palabra, 2)) {
       token.tipo = error;
     } else {
       token.tipo = numCor;
-      token.numero = numero;
+      token.numero = (int) numero;
     }
 
   } else if (palabra[0] == '{' && es_un_numero_con_caracter(palabra + 1, ',')) {
     palabra[strlen(palabra)] = '\0';
-    int numero = strtol(palabra + 1, NULL, 10);
+    long numero = strtol(palabra + 1, NULL, 10);
     // Chequeo de que la funcion strtol no haya dado error.
-    if (numero == 0 && strlen(palabra) != 3) {
+    if (!long_chequear_int(numero, palabra, 3)) {
       token.tipo = error;
     } else {
       token.tipo = corNumComa;
-      token.numero = numero;
+      token.numero = (int) numero;
     }
 
   } else if (palabra[0] == '{' && es_un_numero_con_caracter(palabra + 1, '}')) {
     palabra[strlen(palabra)] = '\0';
-    int numero = strtol(palabra + 1, NULL, 10);
+    long numero = strtol(palabra + 1, NULL, 10);
     // Chequeo de que la funcion strtol no haya dado error.
-    if (numero == 0 && strlen(palabra) != 3) {
+    if (!long_chequear_int(numero, palabra, 3)) {
       token.tipo = error;
     } else {
       token.tipo = corNumCor;
-      token.numero = numero;
+      token.numero = (int) numero;
     }
 
   } else if (palabra[0] == '~') {

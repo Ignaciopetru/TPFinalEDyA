@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include "avltree.h"
 #include "lists/queue.h"
 #include "lists/stack.h"

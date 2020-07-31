@@ -1,8 +1,9 @@
 #ifndef INTERVALO_H_INCLUDED
 #define INTERVALO_H_INCLUDED
+#include <limits.h>
 
-// Menor mayor int aceptado en general.
-#define INFINITO 32768
+// Menor mayor int aceptado en general. Solo por comodidad de notacion.
+#define INFINITO INT_MAX
 // Representacion del intervalo vacio.
 #define VACIO ((Intervalo){.inicio = 1, .final = -1})
 
