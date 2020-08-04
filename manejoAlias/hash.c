@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include "hash.h"
@@ -15,13 +16,13 @@ HashTabla *hash_crear(int initial_size) {
 }
 
 // Funcion de hasheo.
-int hash_obtener_key(char *alias) {
-  unsigned long hash = 5381;
+int hash_obtener_key(int largoTabla, char *alias) {
+  unsigned int hash = 5381;
 
   for (int i = 0; alias[i]; i++)
     hash = (33 * hash) + alias[i];
-
-  return hash;
+  // Puedo retornar un int, largoTabla es int, y hash % largoTabla <= largoTabla
+  return hash % largoTabla;
 }
 
 int comparar(char *a1, char *a2){
@@ -32,7 +33,7 @@ void hash_insertar(HashTabla *tabla, char *alias, AVLTree conjunto) {
   int key;
   HashNodo *nodoNuevo = NULL;
   // Se obtienen la key del alias.
-  key = hash_obtener_key(alias) % tabla->size;
+  key = hash_obtener_key(tabla->size, alias);
 
   for (HashNodo *aux = tabla->tabla[key].lista; aux != NULL; aux = aux->sig) {
     if (comparar(alias, aux->alias)){
@@ -57,7 +58,7 @@ AVLTree hash_buscar(HashTabla *tabla, char *alias) {
   int key;
   HashNodo *nodo;
 
-  key = hash_obtener_key(alias) % tabla->size;
+  key = hash_obtener_key(tabla->size, alias);
 
   // Busca en la lista.
   for (nodo = tabla->tabla[key].lista;

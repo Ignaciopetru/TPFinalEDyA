@@ -36,4 +36,7 @@ int intervalo_interseccion(Intervalo, Intervalo);
 // intervalo_valor_interseccion retorna el intervalo interseccion entre dos.
 Intervalo intervalo_valor_interseccion(Intervalo, Intervalo);
 
+// intervalo_aumentado retonra un intervalo aumentado en 1 unidad de ser posible
+Intervalo intervalo_aumentado(Intervalo);
+
 #endif

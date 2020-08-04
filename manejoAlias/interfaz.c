@@ -52,7 +52,7 @@ AVLTree alias_validar (HashTabla *tabla, char *alias) {
 // Chequear que el numero este en el universo a trabajar.
 int long_chequear_int(long numero, char *palabra, int largoDebido) {
   if (numero > INT_MAX || numero < INT_MIN ||
-      (numero == 0 && strlen(palabra) != largoDebido))
+      (numero == 0 && (int)strlen(palabra) != largoDebido))
     return 0;
   return 1;
 }

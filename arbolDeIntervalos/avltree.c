@@ -164,26 +164,27 @@ AVLTree itree_insertar(AVLTree arbol, Intervalo dato) {
 
 }
 
+
 // Inserta un intervalo, pero de forma de que nunca haya en el arbol intervalos
 // con interseccion no nula.
 AVLTree itree_insertar_disjutos (AVLTree arbol, Intervalo intervalo) {
 
   // Se chequea si el intervalo tiene interseccion con algun nodo del arbol.
-  // Se agranda el intervalo, pues si hay dos intervalos contiguos me interesa
+  // Se aumenta el intervalo, pues si hay dos intervalos contiguos me interesa
   // unirlos, de forma que la cantidad de nodos sea la menor posible.
-  Intervalo intAum = intervalo_crear(intervalo.inicio - 1, intervalo.final + 1);
-  AVLTree interseccion = itree_intersecar(arbol, intAum);
+
+  AVLTree interseccion = itree_intersecar(arbol, intervalo_aumentado(intervalo));
 
   while (interseccion != NULL) {
     // Si se encuentra interseccion, se elimina ese nodo y se modifica el
     // intervalo a insertar de manera que contenga ambos.
     intervalo.inicio = min(intervalo.inicio, interseccion->intervalo.inicio);
     intervalo.final = max(intervalo.final, interseccion->intervalo.final);
+
     arbol = itree_eliminar(arbol, interseccion->intervalo);
-    // intA es el intervalo aumentado, recorte el nombre para que no supere
-    // 80 caracteres.
-    Intervalo intA = intervalo_crear(intervalo.inicio - 1, intervalo.final + 1);
-    interseccion = itree_intersecar(arbol, intA);
+
+    interseccion = itree_intersecar(arbol, intervalo_aumentado(intervalo));
+
   }
 
   // Una vez eliminadas todas las intersecciones y modificado el intervalo,

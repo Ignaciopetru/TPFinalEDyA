@@ -58,3 +58,13 @@ Intervalo intervalo_valor_interseccion(Intervalo interA, Intervalo interB) {
   resultado.final = min(interA.final, interB.final);
   return resultado;
 }
+
+Intervalo intervalo_aumentado (Intervalo intervalo) {
+  if (intervalo.final == INFINITO && intervalo.inicio == -INFINITO)
+    return intervalo_crear(intervalo.inicio, intervalo.final);
+  if (intervalo.final == INFINITO)
+    return intervalo_crear(intervalo.inicio - 1, intervalo.final);
+  if (intervalo.inicio == -INFINITO)
+    return intervalo_crear(intervalo.inicio, intervalo.final + 1);
+  return intervalo_crear(intervalo.inicio - 1, intervalo.final + 1);
+}
