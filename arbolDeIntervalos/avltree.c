@@ -186,7 +186,6 @@ AVLTree itree_insertar_disjutos (AVLTree arbol, Intervalo intervalo) {
     interseccion = itree_intersecar(arbol, intervalo_aumentado(intervalo));
 
   }
-
   // Una vez eliminadas todas las intersecciones y modificado el intervalo,
   // se inserta en el arbol.
   return itree_insertar(arbol, intervalo);
@@ -386,7 +385,6 @@ AVLTree itree_complemento(AVLTree conjunto) {
     }
 
   }
-
   stack_destruir(stack);
 
   // Caso intervalo termina en infinito.
@@ -479,7 +477,7 @@ void inodo_imprimir(AVLTree nodo) {
   intervalo_imprimir(nodo->intervalo);
 }
 
-
+// Para mostrar el conjunto en orden.
 void itree_recorrer_inorder(AVLTree arbol, Visitante visitante) {
   if (arbol == NULL)
     return;
@@ -510,20 +508,3 @@ AVLTree itree_recorrer_dfs(AVLTree arbol, Visitante visitante, AVLTree puntero){
   return puntero;
 }
 
-// Se iguala el parametro puntero a la ejecucion de la funcion visitante sobre
-// el nodo actual del arbol.
-AVLTree itree_recorrer_bfs(AVLTree arbol, Visitante visitante, AVLTree puntero){
-  Queue queue = queue_new();
-  if (arbol)
-    queue_agregar(queue, arbol);
-  while (!queue_isEmpty(queue)) {
-    AVLTree nodo = queue_sacar(queue);
-    visitante(nodo, puntero);
-    if (nodo->izq != NULL)
-      queue_agregar(queue, nodo->izq);
-    if (nodo->der != NULL)
-      queue_agregar(queue, nodo->der);
-  }
-  queue_destruir(queue);
-  return puntero;
-}
