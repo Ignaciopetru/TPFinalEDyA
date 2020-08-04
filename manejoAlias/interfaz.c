@@ -125,7 +125,8 @@ Token token_crear (char *palabra) {
       token.numero = (int) numero;
     }
 
-  } else if (palabra[0] == '{' && es_un_numero_con_caracter(palabra + 1, ',')) {
+  } else if (palabra[0] == '{' && es_un_numero_con_caracter(palabra + 1,
+    ',')) {
     palabra[strlen(palabra)] = '\0';
     long numero = strtol(palabra + 1, NULL, 10);
     // Chequeo de que la funcion strtol no haya dado error.
@@ -136,7 +137,8 @@ Token token_crear (char *palabra) {
       token.numero = (int) numero;
     }
 
-  } else if (palabra[0] == '{' && es_un_numero_con_caracter(palabra + 1, '}')) {
+  } else if (palabra[0] == '{' && es_un_numero_con_caracter(palabra + 1,
+    '}')) {
     palabra[strlen(palabra)] = '\0';
     long numero = strtol(palabra + 1, NULL, 10);
     // Chequeo de que la funcion strtol no haya dado error.
