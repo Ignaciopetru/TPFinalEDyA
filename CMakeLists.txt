@@ -10,8 +10,6 @@ include_directories(lists/dlist)
 add_executable(TPFinalEDyA_master
     arbolDeIntervalos/lists/dlist/dlist.c
     arbolDeIntervalos/lists/dlist/dlist.h
-    arbolDeIntervalos/lists/queue.c
-    arbolDeIntervalos/lists/queue.h
     arbolDeIntervalos/lists/stack.c
     arbolDeIntervalos/lists/stack.h
     arbolDeIntervalos/avltree.c

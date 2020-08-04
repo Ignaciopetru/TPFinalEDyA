@@ -12,7 +12,6 @@ typedef struct _HashNodo {
 // Cabeza de la lista
 typedef struct _HashDato{
     HashNodo *lista;
-    int cantidad;
 } HashDato;
 
 typedef struct {

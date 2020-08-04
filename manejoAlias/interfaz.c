@@ -165,6 +165,7 @@ Token token_crear (char *palabra) {
     token.tipo = error;
 
   }
+
   return token;
 }
 
@@ -219,11 +220,17 @@ void insertar_conjunto_compresion (HashTabla *tabla, Tokens lista) {
   }
 
   // Chequeo de completitud de la sintxis.
-  if (lista.palabras[3].tipo == num && lista.palabras[4].tipo == menorIgual && lista.palabras[5].tipo == x && lista.palabras[6].tipo == menorIgual && lista.palabras[7].tipo == numCor) {
-    Intervalo intervalo = intervalo_crear(lista.palabras[3].numero, lista.palabras[7].numero);
+  if (lista.palabras[3].tipo == num && lista.palabras[4].tipo == menorIgual &&
+      lista.palabras[5].tipo == x && lista.palabras[6].tipo == menorIgual &&
+      lista.palabras[7].tipo == numCor) {
+
+    Intervalo intervalo = intervalo_crear(lista.palabras[3].numero,
+                                          lista.palabras[7].numero);
+
     if (intervalo_validar(intervalo)) {
       // Si el intervalo es valido
-      hash_insertar(tabla, lista.palabras[0].alias, itree_insertar(NULL, intervalo));
+      hash_insertar(tabla, lista.palabras[0].alias,
+                    itree_insertar(NULL, intervalo));
       return;
     }
     // Si el inicio es mayor al final, el conjunto es el vacio.
@@ -257,13 +264,15 @@ void insertar_conjunto_extension (HashTabla *tabla, Tokens lista) {
 
   for (; lista.palabras[i].tipo == numComa; i++) {
     numero = lista.palabras[i].numero;
-    conjunto = itree_insertar_disjutos(conjunto, intervalo_crear(numero, numero));
+    conjunto = itree_insertar_disjutos(conjunto,
+                                       intervalo_crear(numero, numero));
   }
 
   // Si es correcto se alamacena en la tabla hash.
   if (lista.palabras[i].tipo == numCor) {
     numero = lista.palabras[i].numero;
-    conjunto = itree_insertar_disjutos(conjunto, intervalo_crear(numero, numero));
+    conjunto = itree_insertar_disjutos(conjunto,
+                                       intervalo_crear(numero, numero));
     hash_insertar(tabla, lista.palabras[0].alias, conjunto);
     return;
   }
@@ -306,25 +315,30 @@ void insertar_operacion(HashTabla *tabla, Tokens lista) {
     printf("Sintaxis invalida\n");
     return;
   }
-  if (lista.palabras[3].tipo != unio && lista.palabras[3].tipo != resta && lista.palabras[3].tipo != inter) {
+  if (lista.palabras[3].tipo != unio && lista.palabras[3].tipo != resta &&
+      lista.palabras[3].tipo != inter) {
     printf("Operacion invalida\n");
     return;
   }
+  // Si la estructura es correcta sigo.
   AVLTree operando1 = alias_validar(tabla, lista.palabras[2].alias);
   AVLTree operando2 = alias_validar(tabla, lista.palabras[4].alias);
   // Se chequea que los alias funcionen.
-  if (operando1 && operando2) {
+  if (operando1 && operando2)
     switch (lista.palabras[3].tipo) {
       case resta: {
-        hash_insertar(tabla, lista.palabras[0].alias, itree_resta(operando1, operando2));
+        hash_insertar(tabla, lista.palabras[0].alias,
+                      itree_resta(operando1, operando2));
         break;
       }
       case inter: {
-        hash_insertar(tabla, lista.palabras[0].alias, itree_interseccion(operando1, operando2));
+        hash_insertar(tabla, lista.palabras[0].alias,
+                      itree_interseccion(operando1, operando2));
         break;
       }
       case unio: {
-        hash_insertar(tabla, lista.palabras[0].alias, itree_union(operando1, operando2));
+        hash_insertar(tabla, lista.palabras[0].alias,
+                      itree_union(operando1, operando2));
         break;
       }
       default: {
@@ -333,9 +347,8 @@ void insertar_operacion(HashTabla *tabla, Tokens lista) {
         break;
       }
     }
-  } else {
-     printf("Alias invalido\n");
-  }
+   else
+    printf("Alias invalido\n");
 }
 
 
@@ -381,7 +394,8 @@ int ejecutar_comando(HashTabla * tabla, Tokens lista) {
 
         case corNumCor: {
           if (lista.largo == 3) {
-            insertar_conjunto_un_elem(tabla, lista.palabras[0].alias, lista.palabras[2].numero);
+            insertar_conjunto_un_elem(tabla, lista.palabras[0].alias,
+                                      lista.palabras[2].numero);
             return 1;
           }
           break;
@@ -397,7 +411,8 @@ int ejecutar_comando(HashTabla * tabla, Tokens lista) {
 
         case notAlias: {
           if (lista.largo == 3) {
-            insertar_complemento(tabla, lista.palabras[0].alias, lista.palabras[2].alias);
+            insertar_complemento(tabla, lista.palabras[0].alias,
+                                 lista.palabras[2].alias);
             return 1;
           }
           break;

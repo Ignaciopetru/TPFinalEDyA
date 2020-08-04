@@ -3,7 +3,6 @@
 #include <string.h>
 #include <limits.h>
 #include "avltree.h"
-#include "lists/queue.h"
 #include "lists/stack.h"
 
 // Funciones auxiliares --------------------------------------------------------
@@ -97,7 +96,6 @@ AVLTree balancear(AVLTree arbol, int balance) {
 
 // Funciones creacion ---------------------------------------------------------
 
-
 AVLTree itree_crear() {
   return NULL;
 }
@@ -164,7 +162,6 @@ AVLTree itree_insertar(AVLTree arbol, Intervalo dato) {
 
 }
 
-
 // Inserta un intervalo, pero de forma de que nunca haya en el arbol intervalos
 // con interseccion no nula.
 AVLTree itree_insertar_disjutos (AVLTree arbol, Intervalo intervalo) {
@@ -195,7 +192,6 @@ AVLTree itree_insertar_disjutos (AVLTree arbol, Intervalo intervalo) {
 AVLTree itree_intersecar(AVLTree arbol, Intervalo intervalo) {
   if (arbol == NULL)
     return arbol;
-
   if (intervalo_interseccion(arbol->intervalo, intervalo))
     return arbol;
 
@@ -344,13 +340,14 @@ AVLTree itree_interseccion(AVLTree a, AVLTree b) {
   return resultado;
 }
 
-
 AVLTree itree_complemento(AVLTree conjunto) {
   // Caso conjunto vacio.
-  if (conjunto->intervalo.inicio == VACIO.inicio && conjunto->intervalo.final == VACIO.final)
+  if (conjunto->intervalo.inicio == VACIO.inicio &&
+                                    conjunto->intervalo.final == VACIO.final)
     return itree_insertar(NULL, intervalo_crear(-INFINITO, INFINITO));
   // Caso universo.
-  if (conjunto->intervalo.inicio == -INFINITO && conjunto->intervalo.final == INFINITO)
+  if (conjunto->intervalo.inicio == -INFINITO &&
+                                    conjunto->intervalo.final == INFINITO)
     return itree_insertar(NULL, intervalo_crear(1, -1));
 
   AVLTree resultado = itree_crear();
@@ -378,9 +375,11 @@ AVLTree itree_complemento(AVLTree conjunto) {
       // Realizo el caso particular de -INFINITO, para no salir del rango minimo
       // de ints.
       if (anterior.final == -INFINITO)
-        resultado = itree_insertar(resultado, intervalo_crear(anterior.final, temp->intervalo.inicio - 1));
+        resultado = itree_insertar(resultado,
+          intervalo_crear(anterior.final, temp->intervalo.inicio - 1));
       else
-        resultado = itree_insertar(resultado, intervalo_crear(anterior.final + 1, temp->intervalo.inicio - 1));
+        resultado = itree_insertar(resultado,
+          intervalo_crear(anterior.final + 1, temp->intervalo.inicio - 1));
       anterior = temp->intervalo;
     }
 
@@ -390,7 +389,9 @@ AVLTree itree_complemento(AVLTree conjunto) {
   // Caso intervalo termina en infinito.
   if (anterior.final == INFINITO)
     return  resultado;
-  resultado = itree_insertar(resultado, intervalo_crear(anterior.final + 1, INFINITO));
+
+  resultado = itree_insertar(resultado,
+                          intervalo_crear(anterior.final + 1, INFINITO));
 
   return resultado;
 }

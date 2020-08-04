@@ -1,8 +1,7 @@
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "hash.h"
-
-
 
 HashTabla *hash_crear(int initial_size) {
 
@@ -42,14 +41,13 @@ void hash_insertar(HashTabla *tabla, char *alias, AVLTree conjunto) {
   }
   // se setea el nuevo nodo
   nodoNuevo = malloc(sizeof(HashNodo));
+  // +1 para el terminador.
   nodoNuevo->alias = malloc(sizeof(char)*(strlen(alias) + 1));
   nodoNuevo->alias = strcpy(nodoNuevo->alias, alias);
   nodoNuevo->conjunto = conjunto;
   nodoNuevo->sig = tabla->tabla[key].lista;
 
   tabla->tabla[key].lista = nodoNuevo;
-  tabla->tabla[key].cantidad++;
-
 }
 
 AVLTree hash_buscar(HashTabla *tabla, char *alias) {
@@ -57,7 +55,6 @@ AVLTree hash_buscar(HashTabla *tabla, char *alias) {
   HashNodo *nodo;
 
   key = hash_obtener_key(tabla->size, alias);
-
   // Busca en la lista.
   for (nodo = tabla->tabla[key].lista;
        nodo != NULL && comparar(alias, nodo->alias) != 1; nodo = nodo->sig);
