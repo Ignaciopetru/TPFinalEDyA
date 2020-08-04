@@ -173,7 +173,7 @@ AVLTree itree_insertar_disjutos (AVLTree arbol, Intervalo intervalo) {
   // Se aumenta el intervalo, pues si hay dos intervalos contiguos me interesa
   // unirlos, de forma que la cantidad de nodos sea la menor posible.
 
-  AVLTree interseccion = itree_intersecar(arbol, intervalo_aumentado(intervalo));
+  AVLTree interseccion = itree_intersecar(arbol,intervalo_aumentado(intervalo));
 
   while (interseccion != NULL) {
     // Si se encuentra interseccion, se elimina ese nodo y se modifica el
@@ -264,7 +264,7 @@ AVLTree itree_union(AVLTree a, AVLTree b) {
 }
 
 // Devuelve un arbol con todos los intervalos interseccion de un intervalo.
-AVLTree  itree_todas_las_intersecciones (Intervalo intervaloDato, AVLTree arbol) {
+AVLTree  itree_todas_las_intersecciones(Intervalo intervaloDato, AVLTree arbol){
 
   AVLTree resultado = NULL;
   Stack stack = stack_new();
