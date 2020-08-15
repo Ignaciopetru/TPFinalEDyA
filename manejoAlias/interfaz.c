@@ -271,7 +271,7 @@ void insertar_conjunto_extension (HashTabla *tabla, Tokens lista) {
   }
 
   // Si es correcto se alamacena en la tabla hash.
-  if (lista.palabras[i].tipo == numCor) {
+  if (lista.palabras[i].tipo == numCor && lista.largo == i + 1) {
     numero = lista.palabras[i].numero;
     conjunto = itree_insertar_disjutos(conjunto,
                                        intervalo_crear(numero, numero));
