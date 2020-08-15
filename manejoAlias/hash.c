@@ -17,7 +17,7 @@ int hash_obtener_key(int largoTabla, char *alias) {
 
   for (int i = 0; alias[i]; i++)
     hash = (33 * hash) + alias[i];
-  // Puedo retornar un int, largoTabla es int, y hash % largoTabla <= largoTabla
+  //Puedo retornar un int, largoTabla es int, y hash % largoTabla <= largoTabla
   return hash % largoTabla;
 }
 

@@ -5,7 +5,7 @@
 #include "avltree.h"
 #include "lists/stack.h"
 
-// Funciones auxiliares --------------------------------------------------------
+// Funciones auxiliares -------------------------------------------------------
 
 int obtener_altura(AVLTree arbol) {
   if (arbol)
@@ -33,7 +33,7 @@ int obtener_mayorFinal(AVLTree arbol) {
                                  arbol->der->mayorFinal));
 }
 
-// Funciones de rotacion y balanceo --------------------------------------------
+// Funciones de rotacion y balanceo -------------------------------------------
 
 
 AVLTree rotar_derecha(AVLTree arbol) {
@@ -170,7 +170,8 @@ AVLTree itree_insertar_disjutos (AVLTree arbol, Intervalo intervalo) {
   // Se aumenta el intervalo, pues si hay dos intervalos contiguos me interesa
   // unirlos, de forma que la cantidad de nodos sea la menor posible.
 
-  AVLTree interseccion = itree_intersecar(arbol,intervalo_aumentado(intervalo));
+  AVLTree interseccion;
+  interseccion = itree_intersecar(arbol,intervalo_aumentado(intervalo));
 
   while (interseccion != NULL) {
     // Si se encuentra interseccion, se elimina ese nodo y se modifica el
@@ -259,7 +260,7 @@ AVLTree itree_union(AVLTree a, AVLTree b) {
 }
 
 // Devuelve un arbol con todos los intervalos interseccion de un intervalo.
-AVLTree  itree_todas_las_intersecciones(Intervalo intervaloDato, AVLTree arbol){
+AVLTree  itree_todas_las_intersecciones(Intervalo intervalo, AVLTree arbol){
 
   AVLTree resultado = NULL;
   Stack stack = stack_new();
@@ -267,12 +268,12 @@ AVLTree  itree_todas_las_intersecciones(Intervalo intervaloDato, AVLTree arbol){
     stack_push(stack, arbol);
 
   while (!stack_isEmpty(stack)) {
-    AVLTree interseccion = itree_intersecar(stack_top(stack), intervaloDato);
+    AVLTree interseccion = itree_intersecar(stack_top(stack), intervalo);
     stack_pop(stack);
 
     if (interseccion) {
       resultado = itree_insertar(resultado, intervalo_valor_interseccion(
-        interseccion->intervalo, intervaloDato));
+        interseccion->intervalo, intervalo));
       // Si un intervalo tiene interseccion con alguno del arbol, al ser
       // intervalos disjuntos, las otras posibles intersecciones estan en los
       // hijos del nodo interseccion.
@@ -372,7 +373,7 @@ AVLTree itree_complemento(AVLTree conjunto) {
     if (temp->intervalo.inicio == -INFINITO)
       anterior = temp->intervalo;
     else {
-      // Realizo el caso particular de -INFINITO, para no salir del rango minimo
+      //Realizo el caso particular de -INFINITO, para no salir del rango minimo
       // de ints.
       if (anterior.final == -INFINITO)
         resultado = itree_insertar(resultado,
@@ -407,7 +408,7 @@ AVLTree itree_resta(AVLTree a, AVLTree b) {
   return resultado;
 }
 
-// Funciones destrucción. ------------------------------------------------------
+// Funciones destrucción. -----------------------------------------------------
 
 AVLTree itree_eliminar(AVLTree arbol, Intervalo dato) {
   if (arbol == NULL) {
@@ -472,7 +473,7 @@ void itree_destruir(AVLTree arbol) {
   free(arbol);
 }
 
-// Funciones recorridos --------------------------------------------------------
+// Funciones recorridos -------------------------------------------------------
 
 void inodo_imprimir(AVLTree nodo) {
   intervalo_imprimir(nodo->intervalo);
@@ -491,14 +492,14 @@ void itree_recorrer_inorder(AVLTree arbol, Visitante visitante) {
 
 // Se iguala el parametro puntero a la ejecucion de la funcion visitante sobre
 // el nodo actual del arbol.
-AVLTree itree_recorrer_dfs(AVLTree arbol, Visitante visitante, AVLTree puntero){
+AVLTree itree_recorrer_dfs(AVLTree arbol, Visitante visitante, AVLTree aux){
   Stack stack = stack_new();
   if (arbol)
     stack_push(stack, arbol);
   while (!stack_isEmpty(stack)) {
     AVLTree nodo = stack_top(stack);
     stack_pop(stack);
-    puntero = visitante(nodo, puntero);
+    aux = visitante(nodo, aux);
     if (nodo->der != NULL)
       stack_push(stack, nodo->der);
     if (nodo->izq != NULL)
@@ -506,6 +507,6 @@ AVLTree itree_recorrer_dfs(AVLTree arbol, Visitante visitante, AVLTree puntero){
   }
 
   stack_destruir(stack);
-  return puntero;
+  return aux;
 }
 

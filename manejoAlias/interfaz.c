@@ -301,7 +301,7 @@ void insertar_conjunto_vacio(HashTabla *tabla, char *alias) {
 
 
 // Lee el comando y realiza el complemento.
-void insertar_complemento(HashTabla *tabla, char *aliasAlmacenar, char *alias) {
+void insertar_complemento(HashTabla *tabla, char *aliasAlmacenar, char *alias){
   AVLTree operando = alias_validar(tabla, alias);
   // Si operando es NULL, el alias no esta almacenado.
   if (operando)
